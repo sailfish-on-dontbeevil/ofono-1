@@ -678,6 +678,10 @@ const char *registration_status_to_string(enum ofono_netreg_status status)
 		return "roaming";
 	case OFONO_NETREG_STATUS_NONE:
 		break;
+	case NETWORK_REGISTRATION_STATUS_REGISTERED_SMS_EUTRAN:
+		return "registered";
+	case NETWORK_REGISTRATION_STATUS_ROAMING_SMS_EUTRAN:
+		return "roaming";
 	}
 
 	return "";
