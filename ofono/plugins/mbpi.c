@@ -399,6 +399,8 @@ static void apn_handler(GMarkupParseContext *context, struct gsm_data *gsm,
 	ap->apn = g_strdup(apn);
 	ap->type = OFONO_GPRS_CONTEXT_TYPE_INTERNET;
 	ap->proto = mbpi_default_proto;
+	
+	/* pre-select default authentication method */
 	ap->auth_method = OFONO_GPRS_AUTH_METHOD_UNSPECIFIED;
 
 	g_markup_parse_context_push(context, &apn_parser, ap);
@@ -473,7 +475,7 @@ static void gsm_end(GMarkupParseContext *context, const gchar *element_name,
 	if (ap->auth_method == OFONO_GPRS_AUTH_METHOD_UNSPECIFIED) {
 		if ((!ap->username || !ap->username[0]) &&
 				(!ap->password || !ap->password[0])) {
-			/* No username or password => no authentication */
+			/* select authentication method NONE if fit */
 			ap->auth_method = OFONO_GPRS_AUTH_METHOD_NONE;
 		} else {
 			ap->auth_method = mbpi_default_auth_method;
