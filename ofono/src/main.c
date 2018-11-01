@@ -34,9 +34,7 @@
 
 #include <gdbus.h>
 
-#ifdef HAVE_ELL
 #include <ell/ell.h>
-#endif
 
 #include "ofono.h"
 
@@ -180,7 +178,6 @@ static GOptionEntry options[] = {
 	{ NULL },
 };
 
-#ifdef HAVE_ELL
 struct ell_event_source {
 	GSource source;
 	GPollFD pollfd;
@@ -204,7 +201,6 @@ static GSourceFuncs event_funcs = {
 	.prepare = event_prepare,
 	.check = event_check,
 };
-#endif
 
 int main(int argc, char **argv)
 {
@@ -213,9 +209,7 @@ int main(int argc, char **argv)
 	DBusConnection *conn;
 	DBusError error;
 	guint signal;
-#ifdef HAVE_ELL
 	struct ell_event_source *source;
-#endif
 
 	context = g_option_context_new(NULL);
 	g_option_context_add_main_entries(context, options, NULL);
@@ -247,7 +241,6 @@ int main(int argc, char **argv)
 
 	event_loop = g_main_loop_new(NULL, FALSE);
 
-#ifdef HAVE_ELL
 	l_log_set_stderr();
 	l_debug_enable("*");
 	l_main_init();
@@ -261,8 +254,6 @@ int main(int argc, char **argv)
 	g_source_add_poll((GSource *)source, &source->pollfd);
 	g_source_attach((GSource *) source,
 					g_main_loop_get_context(event_loop));
-#endif
-
 
 	signal = setup_signalfd();
 
@@ -317,10 +308,9 @@ int main(int argc, char **argv)
 cleanup:
 	g_source_remove(signal);
 
-#ifdef HAVE_ELL
 	g_source_destroy((GSource *) source);
 	l_main_exit();
-#endif
+
 	g_main_loop_unref(event_loop);
 
 	__ofono_log_cleanup(option_backtrace);
