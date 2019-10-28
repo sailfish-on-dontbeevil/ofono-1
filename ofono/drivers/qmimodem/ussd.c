@@ -67,6 +67,9 @@ static int convert_qmi_dcs_gsm_dcs(int qmi_dcs, int *gsm_dcs)
 	case QMI_USSD_DCS_ASCII:
 		*gsm_dcs = USSD_DCS_8BIT;
 		break;
+	case QMI_USSD_DCS_UCS2:
+		*gsm_dcs = USSD_DCS_UCS2;
+		break;
 	default:
 		return 1;
 	}
