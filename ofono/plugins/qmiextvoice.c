@@ -480,7 +480,7 @@ static void all_call_status_ind(struct qmi_result *result, void *user_data)
 		call->status = 1;
 
 		if (qmiext_to_ofono_status(call_info.state, &call->status)) {
-			if(call_info.state == QMI_CALL_STATE_END) {
+			if (call_info.state == QMI_CALL_STATE_END) {
 				struct ofono_error error = {
 					OFONO_ERROR_TYPE_NO_ERROR, 0
 				};
