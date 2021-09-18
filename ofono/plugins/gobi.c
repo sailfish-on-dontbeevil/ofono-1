@@ -29,7 +29,7 @@
 #include <unistd.h>
 #include <stdlib.h>
 
-#include <sailfish_manager.h>
+/*#include <sailfish_manager.h>*/
 
 #define OFONO_API_SUBJECT_TO_CHANGE
 #include <ofono/plugin.h>
