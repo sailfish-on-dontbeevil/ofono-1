@@ -145,7 +145,7 @@ static void gobi_get_ids_cb(struct qmi_result *result, void *user_data)
 											 (OFONO_RADIO_ACCESS_MODE_GSM | OFONO_RADIO_ACCESS_MODE_UMTS | OFONO_RADIO_ACCESS_MODE_LTE),
 											 sslot->imei, 
 											 "00", 
-											 SAILFISH_SIM_STATE_PRESENT);
+											 OFONO_SLOT_SIM_PRESENT);
 		}
     }
 }
@@ -662,7 +662,7 @@ static guint slot_gobi_plugin_start(slot_gobi_plugin *plugin)
 	
 	slot->handle = sailfish_manager_slot_add(plugin->handle, slot,
 				"/quectelqmi_0", (OFONO_RADIO_ACCESS_MODE_GSM | OFONO_RADIO_ACCESS_MODE_UMTS | OFONO_RADIO_ACCESS_MODE_LTE),
-				slot->imei, "00", SAILFISH_SIM_STATE_PRESENT);*/
+				slot->imei, "00", OFONO_SLOT_SIM_PRESENT);*/
 
 //	slot_gobi_slot_enabled_changed(slot);
 
