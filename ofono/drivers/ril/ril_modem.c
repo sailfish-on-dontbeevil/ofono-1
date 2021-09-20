@@ -25,9 +25,8 @@
 #include "ril_util.h"
 #include "ril_log.h"
 
-#include <ofono/message-waiting.h>
-#include <ofono/cell-info.h>
-#include <ofono/sim-auth.h>
+#include "ofono.h"
+
 #include <ofono/watch.h>
 
 #define ONLINE_TIMEOUT_SECS     (15) /* 20 sec is hardcoded in ofono core */
@@ -92,26 +91,40 @@ static struct ril_modem_data *ril_modem_data_from_ofono(struct ofono_modem *o)
 	return md;
 }
 
-struct ofono_sim *ril_modem_ofono_sim(struct ril_modem *m)
+static void *ril_modem_get_atom_data(struct ril_modem *modem,
+						enum ofono_atom_type type)
 {
-	return (m && m->ofono) ? ofono_modem_get_sim(m->ofono) : NULL;
+	if (modem && modem->ofono) {
+		struct ofono_atom *atom =
+			__ofono_modem_find_atom(modem->ofono, type);
+
+		if (atom) {
+			return __ofono_atom_get_data(atom);
+		}
+	}
+
+	return NULL;
 }
 
-struct ofono_gprs *ril_modem_ofono_gprs(struct ril_modem *m)
+struct ofono_sim *ril_modem_ofono_sim(struct ril_modem *modem)
 {
-	return (m && m->ofono) ? ofono_modem_get_gprs(m->ofono) : NULL;
+	return ril_modem_get_atom_data(modem, OFONO_ATOM_TYPE_SIM);
 }
 
-struct ofono_netreg *ril_modem_ofono_netreg(struct ril_modem *m)
+struct ofono_gprs *ril_modem_ofono_gprs(struct ril_modem *modem)
 {
-	return (m && m->ofono) ? ofono_modem_get_netreg(m->ofono) : NULL;
+	return ril_modem_get_atom_data(modem, OFONO_ATOM_TYPE_GPRS);
+}
+
+struct ofono_netreg *ril_modem_ofono_netreg(struct ril_modem *modem)
+{
+	return ril_modem_get_atom_data(modem, OFONO_ATOM_TYPE_NETREG);
 }
 
 static inline struct ofono_radio_settings *ril_modem_radio_settings(
 						struct ril_modem *modem)
 {
-	return (modem && modem->ofono) ?
-			ofono_modem_get_radio_settings(modem->ofono) : NULL;
+	return ril_modem_get_atom_data(modem, OFONO_ATOM_TYPE_RADIO_SETTINGS);
 }
 
 void ril_modem_delete(struct ril_modem *md)
@@ -434,7 +447,7 @@ static void ril_modem_remove(struct ofono_modem *ofono)
 	ril_network_unref(modem->network);
 	ril_sim_card_unref(modem->sim_card);
 	ril_data_unref(modem->data);
-	ofono_cell_info_unref(modem->cell_info);
+	sailfish_cell_info_unref(modem->cell_info);
 	grilio_channel_unref(modem->io);
 	grilio_queue_cancel_all(md->q, FALSE);
 	grilio_queue_unref(md->q);
@@ -453,7 +466,7 @@ struct ril_modem *ril_modem_create(GRilIoChannel *io, const char *log_prefix,
 		struct ril_radio *radio, struct ril_network *network,
 		struct ril_sim_card *card, struct ril_data *data,
 		struct ril_sim_settings *settings, struct ril_vendor *vendor,
-		struct ofono_cell_info *cell_info)
+		struct sailfish_cell_info *cell_info)
 {
 	/* Skip the slash from the path, it looks like "/ril_0" */
 	struct ofono_modem *ofono = ofono_modem_create(path + 1,
@@ -484,7 +497,7 @@ struct ril_modem *ril_modem_create(GRilIoChannel *io, const char *log_prefix,
 		modem->network = ril_network_ref(network);
 		modem->sim_card = ril_sim_card_ref(card);
 		modem->sim_settings = ril_sim_settings_ref(settings);
-		modem->cell_info = ofono_cell_info_ref(cell_info);
+		modem->cell_info = sailfish_cell_info_ref(cell_info);
 		modem->data = ril_data_ref(data);
 		modem->io = grilio_channel_ref(io);
 		md->q = grilio_queue_new(io);

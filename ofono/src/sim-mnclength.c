@@ -4,7 +4,6 @@
  *
  *  Copyright (C) 2011  Nokia Corporation and/or its subsidiary(-ies).
  *  Copyright (C) 2013  Canonical Ltd.
- *  Copyright (C) 2015-2021 Jolla Ltd.
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License version 2 as
@@ -32,7 +31,7 @@
 
 static GSList *g_drivers = NULL;
 
-int ofono_sim_mnclength_get_mnclength(const char *imsi)
+int __ofono_sim_mnclength_get_mnclength(const char *imsi)
 {
 	GSList *d;
 	int mnclen;
@@ -54,35 +53,12 @@ int ofono_sim_mnclength_get_mnclength(const char *imsi)
 	return 0;
 }
 
-int ofono_sim_mnclength_get_mnclength_mccmnc(int mcc, int mnc)
-{
-	GSList *d;
-	int mnclen;
-
-	for (d = g_drivers; d != NULL; d = d->next) {
-		const struct ofono_sim_mnclength_driver *driver = d->data;
-
-		if (driver->get_mnclength_mccmnc == NULL)
-			continue;
-
-		DBG("Calling mnclength plugin '%s' for %d %d",
-						driver->name, mcc, mnc);
-
-		if ((mnclen = driver->get_mnclength_mccmnc(mcc, mnc)) <= 0)
-			continue;
-
-		return mnclen;
-	}
-
-	return 0;
-}
-
 int ofono_sim_mnclength_driver_register(
-			const struct ofono_sim_mnclength_driver *driver)
+			struct ofono_sim_mnclength_driver *driver)
 {
 	DBG("driver: %p name: %s", driver, driver->name);
 
-	g_drivers = g_slist_prepend(g_drivers, (void*) driver);
+	g_drivers = g_slist_prepend(g_drivers, driver);
 	return 0;
 }
 

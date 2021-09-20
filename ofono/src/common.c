@@ -3,7 +3,6 @@
  *  oFono - Open Source Telephony
  *
  *  Copyright (C) 2008-2011  Intel Corporation. All rights reserved.
- *  Copyright (C) 2015-2021  Jolla Ltd.
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License version 2 as
@@ -30,7 +29,7 @@
 
 #include <glib.h>
 
-#include <ofono/misc.h>
+#include <ofono/types.h>
 #include <ofono/gprs-context.h>
 #include "common.h"
 #include "util.h"
@@ -423,9 +422,10 @@ int mmi_service_code_to_bearer_class(int code)
 	return cls;
 }
 
-const char *ofono_phone_number_to_string(const struct ofono_phone_number *ph,
-			char buffer[/* OFONO_MAX_PHONE_NUMBER_BUFFER_SIZE */])
+const char *phone_number_to_string(const struct ofono_phone_number *ph)
 {
+	static char buffer[OFONO_MAX_PHONE_NUMBER_LENGTH + 2];
+
 	if (ph->type == 145 && (strlen(ph->number) > 0) &&
 			ph->number[0] != '+') {
 		buffer[0] = '+';
@@ -437,13 +437,6 @@ const char *ofono_phone_number_to_string(const struct ofono_phone_number *ph,
 	}
 
 	return buffer;
-}
-
-const char *phone_number_to_string(const struct ofono_phone_number *ph)
-{
-	static char buffer[OFONO_PHONE_NUMBER_BUFFER_SIZE];
-
-	return ofono_phone_number_to_string(ph, buffer);
 }
 
 void string_to_phone_number(const char *str, struct ofono_phone_number *ph)
@@ -661,7 +654,7 @@ const char *bearer_class_to_string(enum bearer_class cls)
 	return NULL;
 }
 
-const char *registration_status_to_string(enum ofono_netreg_status status)
+const char *registration_status_to_string(int status)
 {
 	switch (status) {
 	case NETWORK_REGISTRATION_STATUS_NOT_REGISTERED:
@@ -676,14 +669,12 @@ const char *registration_status_to_string(enum ofono_netreg_status status)
 		return "unknown";
 	case NETWORK_REGISTRATION_STATUS_ROAMING:
 		return "roaming";
-	case OFONO_NETREG_STATUS_NONE:
-		break;
 	}
 
 	return "";
 }
 
-const char *registration_tech_to_string(enum ofono_access_technology tech)
+const char *registration_tech_to_string(int tech)
 {
 	switch (tech) {
 	case ACCESS_TECHNOLOGY_GSM:
@@ -702,10 +693,9 @@ const char *registration_tech_to_string(enum ofono_access_technology tech)
 		return "hspa";
 	case ACCESS_TECHNOLOGY_EUTRAN:
 		return "lte";
-	case OFONO_ACCESS_TECHNOLOGY_NONE:
-		break;
+	default:
+		return "";
 	}
-	return "";
 }
 
 gboolean is_valid_apn(const char *apn)
@@ -774,16 +764,4 @@ const char *call_status_to_string(enum call_status status)
 	}
 
 	return "unknown";
-}
-
-/* Public API exported to external plugins */
-
-const char *ofono_netreg_status_to_string(enum ofono_netreg_status status)
-{
-	return registration_status_to_string(status);
-}
-
-const char *ofono_access_technology_to_string(enum ofono_access_technology tech)
-{
-	return registration_tech_to_string(tech);
 }
