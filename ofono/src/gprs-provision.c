@@ -3,7 +3,6 @@
  *  oFono - Open Source Telephony
  *
  *  Copyright (C) 2011  Nokia Corporation and/or its subsidiary(-ies).
- *  Copyright (C) 2015-2021  Jolla Ltd.
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License version 2 as
@@ -24,14 +23,13 @@
 #include <config.h>
 #endif
 
+#include <string.h>
 #include <glib.h>
-
-#include <ofono/gprs-provision.h>
-#include <ofono/log.h>
+#include "ofono.h"
 
 static GSList *g_drivers = NULL;
 
-void ofono_gprs_provision_free_settings(
+void  __ofono_gprs_provision_free_settings(
 				struct ofono_gprs_provision_data *settings,
 				int count)
 {
@@ -50,7 +48,7 @@ void ofono_gprs_provision_free_settings(
 	g_free(settings);
 }
 
-ofono_bool_t ofono_gprs_provision_get_settings(const char *mcc,
+ofono_bool_t __ofono_gprs_provision_get_settings(const char *mcc,
 				const char *mnc, const char *spn,
 				struct ofono_gprs_provision_data **settings,
 				int *count)

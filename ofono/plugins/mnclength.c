@@ -3,7 +3,6 @@
  *  oFono - Open Source Telephony
  *
  *  Copyright (C) 2013  Canonical Ltd.
- *  Copyright (C) 2015-2021 Jolla Ltd.
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License version 2 as
@@ -319,7 +318,7 @@ static int comp_mcc(const void *key, const void *value)
 	return mcc - mccmnc->mcc;
 }
 
-static int mnclength_mccmnc(int mcc, int mnc)
+int mnclength(int mcc, int mnc)
 {
 	int mccmnc_num = 1000*mcc + mnc;
 	int *mccmnc3_res = bsearch(&mccmnc_num, codes_mnclen3_db,
@@ -382,8 +381,7 @@ static int mnclength_get_mnclength(const char *imsi)
 
 static struct ofono_sim_mnclength_driver mnclength_driver = {
 	.name		= "MNC length",
-	.get_mnclength	= mnclength_get_mnclength,
-	.get_mnclength_mccmnc = mnclength_mccmnc
+	.get_mnclength	= mnclength_get_mnclength
 };
 
 static int mnclength_init(void)

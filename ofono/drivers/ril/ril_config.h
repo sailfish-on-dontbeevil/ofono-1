@@ -1,7 +1,7 @@
 /*
  *  oFono - Open Source Telephony - RIL-based devices
  *
- *  Copyright (C) 2015-2021 Jolla Ltd.
+ *  Copyright (C) 2015-2020 Jolla Ltd.
  *  Copyright (C) 2019-2020 Open Mobile Platform LLC.
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -19,10 +19,28 @@
 
 #include "ril_types.h"
 
-#include <ofono/conf.h>
+/* Utilities for parsing ril_subscription.conf */
 
-#define RILCONF_SETTINGS_GROUP OFONO_COMMON_SETTINGS_GROUP
+#define RILCONF_SETTINGS_GROUP      "Settings"
 
+char *ril_config_get_string(GKeyFile *file, const char *group,
+					const char *key);
+char **ril_config_get_strings(GKeyFile *file, const char *group,
+			      const char *key, char delimiter);
+gboolean ril_config_get_integer(GKeyFile *file, const char *group,
+					const char *key, int *value);
+gboolean ril_config_get_boolean(GKeyFile *file, const char *group,
+					const char *key, gboolean *value);
+gboolean ril_config_get_flag(GKeyFile *file, const char *group,
+					const char *key, int flag, int *flags);
+gboolean ril_config_get_enum(GKeyFile *file, const char *group,
+					const char *key, int *result,
+					const char *name, int value, ...)
+					G_GNUC_NULL_TERMINATED;
+gboolean ril_config_get_mask(GKeyFile *file, const char *group,
+					const char *key, int *result,
+					const char *name, int value, ...)
+					G_GNUC_NULL_TERMINATED;
 GUtilInts *ril_config_get_ints(GKeyFile *file, const char *group,
 					const char *key);
 char *ril_config_ints_to_string(GUtilInts *ints, char separator);
