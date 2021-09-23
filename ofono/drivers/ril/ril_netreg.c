@@ -1,7 +1,7 @@
 /*
  *  oFono - Open Source Telephony - RIL-based devices
  *
- *  Copyright (C) 2015-2021 Jolla Ltd.
+ *  Copyright (C) 2015-2020 Jolla Ltd.
  *  Copyright (C) 2019-2020 Open Mobile Platform LLC.
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -16,13 +16,15 @@
 
 #include "ril_plugin.h"
 #include "ril_network.h"
-#include "ril_netreg.h"
 #include "ril_util.h"
 #include "ril_vendor.h"
 #include "ril_log.h"
 
+#include "ofono.h"
+#include "common.h"
+#include "simutil.h"
+
 #include <ofono/watch.h>
-#include <ofono/gprs-provision.h>
 
 #define REGISTRATION_MAX_RETRIES (2)
 
@@ -91,17 +93,20 @@ static struct ril_netreg_cbd *ril_netreg_cbd_new(struct ril_netreg *nd,
 	return cbd;
 }
 
-enum ofono_netreg_status ril_netreg_check_if_really_roaming
-	(struct ofono_netreg *netreg, enum ofono_netreg_status status)
+int ril_netreg_check_if_really_roaming(struct ofono_netreg *netreg,
+								gint status)
 {
-	if (status == OFONO_NETREG_STATUS_ROAMING) {
+	if (status == NETWORK_REGISTRATION_STATUS_ROAMING) {
 		/* These functions tolerate NULL argument */
 		const char *net_mcc = ofono_netreg_get_mcc(netreg);
 		const char *net_mnc = ofono_netreg_get_mnc(netreg);
+		struct sim_spdi *spdi = ofono_netreg_get_spdi(netreg);
 
-		if (ofono_netreg_spdi_lookup(netreg, net_mcc, net_mnc)) {
-			ofono_info("not roaming based on spdi");
-			return OFONO_NETREG_STATUS_REGISTERED;
+		if (spdi && net_mcc && net_mnc) {
+			if (sim_spdi_lookup(spdi, net_mcc, net_mnc)) {
+				ofono_info("not roaming based on spdi");
+				return NETWORK_REGISTRATION_STATUS_REGISTERED;
+			}
 		}
 	}
 
@@ -197,7 +202,7 @@ static gboolean ril_netreg_strange(const struct ofono_network_operator *op,
 {
 	gsize mcclen;
 
-	if (sim && op->status != OFONO_OPERATOR_STATUS_CURRENT) {
+	if (sim && op->status != OPERATOR_STATUS_CURRENT) {
 		const char *spn = ofono_sim_get_spn(sim);
 		const char *mcc = ofono_sim_get_mcc(sim);
 		const char *mnc = ofono_sim_get_mnc(sim);
@@ -238,7 +243,7 @@ static void ril_netreg_process_operators(struct ril_netreg *nd,
 			int np = 0;
 
 			if (ril_netreg_strange(op, nd->watch->sim) &&
-				ofono_gprs_provision_get_settings(op->mcc,
+				__ofono_gprs_provision_get_settings(op->mcc,
 						op->mnc, NULL, &prov, &np)) {
 				/* Use the first entry */
 				if (np > 0 && prov->provider_name &&
@@ -248,7 +253,7 @@ static void ril_netreg_process_operators(struct ril_netreg *nd,
 					strncpy(op->name, prov->provider_name,
 						OFONO_MAX_OPERATOR_NAME_LENGTH);
 				}
-				ofono_gprs_provision_free_settings(prov, np);
+				__ofono_gprs_provision_free_settings(prov, np);
 			}
 		}
 	}
@@ -301,15 +306,16 @@ static void ril_netreg_list_operators_cb(GRilIoChannel *io, int status,
 		}
 
 		/* Set the proper status  */
-		op->status = OFONO_OPERATOR_STATUS_UNKNOWN;
-		if (status) {
-			if (!strcmp(status, "available")) {
-				op->status = OFONO_OPERATOR_STATUS_AVAILABLE;
-			} else if (!strcmp(status, "current")) {
-				op->status = OFONO_OPERATOR_STATUS_CURRENT;
-			} else if (!strcmp(status, "forbidden")) {
-				op->status = OFONO_OPERATOR_STATUS_FORBIDDEN;
-			}
+		if (!status) {
+			op->status = OPERATOR_STATUS_UNKNOWN;
+		} else if (!strcmp(status, "available")) {
+			op->status = OPERATOR_STATUS_AVAILABLE;
+		} else if (!strcmp(status, "current")) {
+			op->status = OPERATOR_STATUS_CURRENT;
+		} else if (!strcmp(status, "forbidden")) {
+			op->status = OPERATOR_STATUS_FORBIDDEN;
+		} else {
+			op->status = OPERATOR_STATUS_UNKNOWN;
 		}
 
 		op->tech = -1;

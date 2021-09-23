@@ -1,7 +1,7 @@
 /*
  *  oFono - Open Source Telephony - RIL-based devices
  *
- *  Copyright (C) 2015-2021 Jolla Ltd.
+ *  Copyright (C) 2015-2017 Jolla Ltd.
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License version 2 as
@@ -16,6 +16,8 @@
 #include "ril_plugin.h"
 #include "ril_util.h"
 #include "ril_log.h"
+
+#include "util.h"
 
 #ifndef UI_LANG
 #  define UI_LANG "/var/lib/environment/nemo/locale.conf"
@@ -81,7 +83,7 @@ static void ril_stk_envelope(struct ofono_stk *stk, int length,
 {
 	struct ril_stk *sd = ril_stk_get_data(stk);
 	GRilIoRequest *req = grilio_request_new();
-	char *hex_envelope = ril_encode_hex(cmd, length);
+	char *hex_envelope = encode_hex(cmd, length, 0);
 
 	DBG("%s", hex_envelope);
 	grilio_request_append_utf8(req, hex_envelope);
@@ -115,7 +117,7 @@ static void ril_stk_terminal_response(struct ofono_stk *stk, int length,
 {
 	struct ril_stk *sd = ril_stk_get_data(stk);
 	GRilIoRequest *req = grilio_request_new();
-	char *hex_tr = ril_encode_hex(resp, length);
+	char *hex_tr = encode_hex(resp, length, 0);
 
 	DBG("rilmodem terminal response: %s", hex_tr);
 	grilio_request_append_utf8(req, hex_tr);
@@ -148,21 +150,19 @@ static void ril_stk_pcmd_notify(GRilIoChannel *io, guint code,
 	struct ril_stk *sd = user_data;
 	GRilIoParser rilp;
 	char *pcmd;
-	void *pdu;
-	guint len;
+	guchar *pdu;
+	long len = 0;
 
 	GASSERT(code == RIL_UNSOL_STK_PROACTIVE_COMMAND);
 	grilio_parser_init(&rilp, data, data_len);
 	pcmd = grilio_parser_get_utf8(&rilp);
-	pdu = ril_decode_hex(pcmd, -1, &len);
-	if (pdu) {
-		DBG("pcmd: %s", pcmd);
-		ofono_stk_proactive_command_notify(sd->stk, len, pdu);
-		g_free(pdu);
-	} else {
-		ofono_warn("Failed to parse STK command %s", pcmd);
-	}
+	DBG("pcmd: %s", pcmd);
+
+	pdu = decode_hex(pcmd, strlen(pcmd), &len, -1);
 	g_free(pcmd);
+
+	ofono_stk_proactive_command_notify(sd->stk, len, pdu);
+	g_free(pdu);
 }
 
 static void ril_stk_event_notify(GRilIoChannel *io, guint code,
@@ -170,23 +170,20 @@ static void ril_stk_event_notify(GRilIoChannel *io, guint code,
 {
 	struct ril_stk *sd = user_data;
 	GRilIoParser rilp;
-	char *pcmd;
-	void *pdu;
-	guint len;
+	char *pcmd = NULL;
+	guchar *pdu = NULL;
+	long len;
 
 	/* Proactive command has been handled by the modem. */
 	GASSERT(code == RIL_UNSOL_STK_EVENT_NOTIFY);
 	grilio_parser_init(&rilp, data, data_len);
 	pcmd = grilio_parser_get_utf8(&rilp);
-	pdu = ril_decode_hex(pcmd, -1, &len);
-	if (pdu) {
-		DBG("pcmd: %s", pcmd);
-		ofono_stk_proactive_command_handled_notify(sd->stk, len, pdu);
-		g_free(pdu);
-	} else {
-		ofono_warn("Failed to parse STK event %s", pcmd);
-	}
+	DBG("pcmd: %s", pcmd);
+	pdu = decode_hex(pcmd, strlen(pcmd), &len, -1);
 	g_free(pcmd);
+
+	ofono_stk_proactive_command_handled_notify(sd->stk, len, pdu);
+	g_free(pdu);
 }
 
 static void ril_stk_session_end_notify(GRilIoChannel *io, guint code,
