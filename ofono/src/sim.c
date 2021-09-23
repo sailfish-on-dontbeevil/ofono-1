@@ -223,9 +223,9 @@ static gboolean password_is_pin(enum ofono_sim_password_type type)
 	return FALSE;
 }
 
-#define puk2pin(type) ofono_sim_puk2pin(type)
+#define puk2pin(type) __ofono_sim_puk2pin(type)
 
-enum ofono_sim_password_type ofono_sim_puk2pin(
+enum ofono_sim_password_type __ofono_sim_puk2pin(
 					enum ofono_sim_password_type type)
 {
 	switch (type) {
@@ -679,7 +679,7 @@ static gboolean set_own_numbers(struct ofono_sim *sim,
 static gboolean sim_allow(DBusMessage *msg,
 		enum ofono_dbus_access_simmgr_method method, const char *arg)
 {
-	return ofono_dbus_access_method_allowed(dbus_message_get_sender(msg),
+	return __ofono_dbus_access_method_allowed(dbus_message_get_sender(msg),
 				OFONO_DBUS_ACCESS_INTF_SIMMGR, method, arg);
 }
 
@@ -1679,7 +1679,7 @@ static void sim_imsi_obtained(struct ofono_sim *sim, const char *imsi)
 	 */
 	if (sim->mnc_length == 0) {
 		int mnc_aux =
-			ofono_sim_mnclength_get_mnclength(sim->imsi);
+			__ofono_sim_mnclength_get_mnclength(sim->imsi);
 		if (mnc_aux > 0)
 			sim->mnc_length = mnc_aux;
 	}
@@ -3572,11 +3572,6 @@ static void sim_file_changed_flush(struct ofono_sim *sim, int id)
 	}
 
 	sim_fs_cache_flush_file(sim->simfs, id);
-}
-
-void ofono_sim_refresh_full(struct ofono_sim *sim)
-{
-	__ofono_sim_refresh(sim, NULL, TRUE, TRUE);
 }
 
 void __ofono_sim_refresh(struct ofono_sim *sim, GSList *file_list,

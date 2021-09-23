@@ -3,7 +3,6 @@
  *  oFono - Open Source Telephony
  *
  *  Copyright (C) 2008-2011  Intel Corporation. All rights reserved.
- *  Copyright (C) 2015-2021  Jolla Ltd.
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License version 2 as
@@ -29,7 +28,6 @@ extern "C" {
 
 #include <ofono/types.h>
 
-struct ofono_modem;
 struct ofono_netreg;
 
 enum ofono_netreg_status {
@@ -62,8 +60,8 @@ struct ofono_network_operator {
 	char name[OFONO_MAX_OPERATOR_NAME_LENGTH + 1];
 	char mcc[OFONO_MAX_MCC_LENGTH + 1];
 	char mnc[OFONO_MAX_MNC_LENGTH + 1];
-	enum ofono_operator_status status;
-	enum ofono_access_technology tech;
+	int status;
+	int tech;
 };
 
 typedef void (*ofono_netreg_operator_cb_t)(const struct ofono_error *error,
@@ -133,16 +131,12 @@ void *ofono_netreg_get_data(struct ofono_netreg *netreg);
 
 int ofono_netreg_get_location(struct ofono_netreg *netreg);
 int ofono_netreg_get_cellid(struct ofono_netreg *netreg);
-enum ofono_netreg_status ofono_netreg_get_status(struct ofono_netreg *netreg);
+int ofono_netreg_get_status(struct ofono_netreg *netreg);
 int ofono_netreg_get_technology(struct ofono_netreg *netreg);
 const char *ofono_netreg_get_mcc(struct ofono_netreg *netreg);
 const char *ofono_netreg_get_mnc(struct ofono_netreg *netreg);
 const char *ofono_netreg_get_name(struct ofono_netreg *netreg);
 struct sim_spdi *ofono_netreg_get_spdi(struct ofono_netreg *netreg);
-
-/* Since mer/1.24+git2 */
-ofono_bool_t ofono_netreg_spdi_lookup(struct ofono_netreg *netreg,
-					const char *mcc, const char *mnc);
 
 #ifdef __cplusplus
 }
