@@ -28,9 +28,7 @@ pkginclude_HEADERS = include/log.h include/plugin.h include/history.h \
 			include/ril-constants.h include/ril-transport.h \
 			include/watch.h gdbus/gdbus.h include/dbus-clients.h \
 			include/netmon.h include/lte.h include/ims.h \
-			include/slot.h include/cell-info.h \
-			include/storage.h include/conf.h include/misc.h \
-			include/mtu-limit.h
+			include/storage.h
 
 nodist_pkginclude_HEADERS = include/version.h
 
@@ -121,12 +119,74 @@ builtin_modules += udevng
 builtin_sources += plugins/udevng.c
 endif
 
+if SAILFISH_MANAGER
+builtin_modules += sailfish_manager
+builtin_sources += plugins/sailfish_manager/sailfish_cell_info.c \
+			plugins/sailfish_manager/sailfish_cell_info_dbus.c \
+			plugins/sailfish_manager/sailfish_manager.c \
+			plugins/sailfish_manager/sailfish_manager_dbus.c \
+			plugins/sailfish_manager/sailfish_sim_info.c \
+			plugins/sailfish_manager/sailfish_sim_info_dbus.c
+endif
+
+
 if SAILFISH_ACCESS
 builtin_modules += sailfish_access
 builtin_sources += plugins/sailfish_access.c
 endif
 
 if RILMODEM
+if SAILFISH_RILMODEM
+
+builtin_modules += ril
+builtin_sources +=	drivers/ril/ril_call_barring.c \
+			drivers/ril/ril_call_forward.c \
+			drivers/ril/ril_call_settings.c \
+			drivers/ril/ril_call_volume.c \
+			drivers/ril/ril_cell_info.c \
+			drivers/ril/ril_config.c \
+			drivers/ril/ril_connman.c \
+			drivers/ril/ril_cbs.c \
+			drivers/ril/ril_data.c \
+			drivers/ril/ril_devinfo.c \
+			drivers/ril/ril_devmon.c \
+			drivers/ril/ril_devmon_auto.c \
+			drivers/ril/ril_devmon_combine.c \
+			drivers/ril/ril_devmon_ds.c \
+			drivers/ril/ril_devmon_ss.c \
+			drivers/ril/ril_devmon_ur.c \
+			drivers/ril/ril_ecclist.c \
+			drivers/ril/ril_gprs.c \
+			drivers/ril/ril_gprs_context.c \
+			drivers/ril/ril_modem.c \
+			drivers/ril/ril_netmon.c \
+			drivers/ril/ril_netreg.c \
+			drivers/ril/ril_network.c \
+			drivers/ril/ril_oem_raw.c \
+			drivers/ril/ril_phonebook.c \
+			drivers/ril/ril_plugin.c \
+			drivers/ril/ril_radio.c \
+			drivers/ril/ril_radio_caps.c \
+			drivers/ril/ril_radio_settings.c \
+			drivers/ril/ril_sim.c \
+			drivers/ril/ril_sim_card.c \
+			drivers/ril/ril_sim_settings.c \
+			drivers/ril/ril_sms.c \
+			drivers/ril/ril_stk.c \
+			drivers/ril/ril_ussd.c \
+			drivers/ril/ril_util.c \
+			drivers/ril/ril_vendor.c \
+			drivers/ril/ril_voicecall.c
+
+# Vendor specific extensions
+builtin_sources +=	drivers/ril/ril_vendor_mtk.c
+
+if DATAFILES
+dist_conf_DATA += drivers/ril/ril_subscription.conf
+endif
+
+else
+
 builtin_sources += $(gril_sources)
 
 builtin_modules += rildev
@@ -166,6 +226,7 @@ builtin_sources += drivers/rilmodem/rilmodem.h \
 			drivers/rilmodem/cbs.c \
 			drivers/infineonmodem/infineon_constants.h \
 			drivers/rilmodem/lte.c
+endif
 endif
 
 if ISIMODEM
@@ -252,7 +313,11 @@ builtin_sources += $(qmi_sources) \
 			drivers/qmimodem/netmon.c
 
 builtin_modules += gobi
-builtin_sources += plugins/gobi.c
+builtin_sources += plugins/gobi.c 
+
+builtin_modules += qmimodem
+builtin_sources += plugins/qmiextvoice.c \
+			plugins/qmiextvoice.h
 endif
 
 if ATMODEM
@@ -438,7 +503,7 @@ builtin_sources += drivers/cdmamodem/cdmamodem.h \
 			drivers/cdmamodem/connman.c
 endif
 
-if EXTRA_MODEMS
+if !RILMODEM
 builtin_modules += g1
 builtin_sources += plugins/g1.c
 
@@ -516,6 +581,9 @@ builtin_sources += plugins/sim900.c
 
 builtin_modules += sim7100
 builtin_sources += plugins/sim7100.c
+
+builtin_modules += connman
+builtin_sources += plugins/connman.c
 
 builtin_modules += telit
 builtin_sources += plugins/telit.c
@@ -693,6 +761,7 @@ endif
 sbin_PROGRAMS = src/ofonod
 
 src_ofonod_SOURCES = $(builtin_sources) $(gatchat_sources) src/ofono.ver \
+			src/mtu-watch.c \
 			src/main.c src/ofono.h src/log.c src/plugin.c \
 			src/modem.c src/common.h src/common.c \
 			src/manager.c src/dbus.c src/util.h src/util.c \
@@ -719,15 +788,12 @@ src_ofonod_SOURCES = $(builtin_sources) $(gatchat_sources) src/ofono.ver \
 			src/handsfree-audio.c src/bluetooth.h \
 			src/sim-mnclength.c src/voicecallagent.c \
 			src/sms-filter.c src/gprs-filter.c \
-			src/dbus-clients.c src/dbus-queue.c src/dbus-access.c \
+			src/dbus-clients.c src/dbus-queue.c \
+			src/dbus-access.c src/config.c \
 			src/voicecall-filter.c src/ril-transport.c \
 			src/hfp.h src/siri.c src/watchlist.c \
 			src/netmon.c src/lte.c src/ims.c \
-			src/netmonagent.c src/netmonagent.h \
-			src/slot-manager.c src/slot-manager-dbus.c \
-			src/cell-info.c src/cell-info-dbus.c \
-			src/sim-info.c src/sim-info-dbus.c \
-			src/conf.c src/mtu-limit.c
+			src/netmonagent.c src/netmonagent.h
 
 src_ofonod_LDADD = gdbus/libgdbus-internal.la $(builtin_libadd) \
 			@GLIB_LIBS@ @DBUS_LIBS@ -ldl
@@ -754,7 +820,8 @@ AM_CFLAGS = @DBUS_CFLAGS@ @GLIB_CFLAGS@ $(builtin_cflags) \
 
 AM_CPPFLAGS = -I$(builddir)/include -I$(builddir)/src -I$(srcdir)/src \
 			-I$(srcdir)/gdbus -I$(srcdir)/gisi -I$(srcdir)/gatchat \
-			-I$(srcdir)/btio -I$(srcdir)/gril
+			-I$(srcdir)/btio -I$(srcdir)/gril \
+			-I$(srcdir)/plugins/sailfish_manager
 
 doc_files = doc/overview.txt doc/ofono-paper.txt doc/release-faq.txt \
 		doc/manager-api.txt doc/modem-api.txt doc/network-api.txt \
@@ -915,56 +982,61 @@ unit_tests = unit/test-common unit/test-util unit/test-idmap \
 				unit/test-simutil unit/test-stkutil \
 				unit/test-sms unit/test-cdmasms
 
-unit_test_conf_SOURCES = unit/test-conf.c src/conf.c src/log.c
-unit_test_conf_CFLAGS = $(AM_CFLAGS) $(COVERAGE_OPT)
-unit_test_conf_LDADD = @GLIB_LIBS@ -ldl
-unit_objects += $(unit_test_conf_OBJECTS)
-unit_tests += unit/test-conf
+if SAILFISH_MANAGER
 
-unit_test_cell_info_SOURCES = unit/test-cell-info.c src/cell-info.c src/log.c
-unit_test_cell_info_CFLAGS = $(AM_CFLAGS) $(COVERAGE_OPT)
-unit_test_cell_info_LDADD = @GLIB_LIBS@ -ldl
-unit_objects += $(unit_test_cell_info_OBJECTS)
-unit_tests += unit/test-cell-info
+unit_test_sailfish_cell_info_SOURCES = unit/test-sailfish_cell_info.c \
+			plugins/sailfish_manager/sailfish_cell_info.c
+unit_test_sailfish_cell_info_CFLAGS = $(AM_CFLAGS) $(COVERAGE_OPT)
+unit_test_sailfish_cell_info_LDADD = @GLIB_LIBS@ -ldl
+unit_objects += $(unit_test_sailfish_cell_info_OBJECTS)
+unit_tests += unit/test-sailfish_cell_info
 
-unit_test_cell_info_dbus_SOURCES = unit/test-dbus.c \
-			unit/test-cell-info-dbus.c unit/fake_cell_info.c \
-			src/cell-info.c src/cell-info-dbus.c \
+unit_test_sailfish_cell_info_dbus_SOURCES = unit/test-dbus.c \
+			unit/test-sailfish_cell_info_dbus.c \
+			unit/fake_sailfish_cell_info.c \
+			plugins/sailfish_manager/sailfish_cell_info.c \
+			plugins/sailfish_manager/sailfish_cell_info_dbus.c \
 			gdbus/object.c src/dbus-clients.c \
 			src/dbus.c src/log.c
-unit_test_cell_info_dbus_CFLAGS = $(AM_CFLAGS) $(COVERAGE_OPT) \
+unit_test_sailfish_cell_info_dbus_CFLAGS = $(AM_CFLAGS) $(COVERAGE_OPT) \
 			@DBUS_GLIB_CFLAGS@
-unit_test_cell_info_dbus_LDADD = @DBUS_GLIB_LIBS@ @GLIB_LIBS@ -ldl
-unit_objects += $(unit_test_cell_info_dbus_OBJECTS)
-unit_tests += unit/test-cell-info-dbus
+unit_test_sailfish_cell_info_dbus_LDADD = @DBUS_GLIB_LIBS@ @GLIB_LIBS@ -ldl
+unit_objects += $(unit_test_sailfish_cell_info_dbus_OBJECTS)
+unit_tests += unit/test-sailfish_cell_info_dbus
 
-unit_test_sim_info_SOURCES = unit/test-sim-info.c unit/fake_watch.c \
-			src/sim-info.c src/storage.c src/watchlist.c src/log.c
-unit_test_sim_info_CFLAGS = $(COVERAGE_OPT) $(AM_CFLAGS) \
+unit_test_sailfish_sim_info_SOURCES = unit/test-sailfish_sim_info.c \
+			unit/fake_watch.c \
+			plugins/sailfish_manager/sailfish_sim_info.c \
+			src/storage.c src/watchlist.c src/log.c
+unit_test_sailfish_sim_info_CFLAGS = $(COVERAGE_OPT) $(AM_CFLAGS) \
 			-DSTORAGEDIR='"/tmp/ofono"'
-unit_test_sim_info_LDADD = @GLIB_LIBS@ -ldl
-unit_objects += $(unit_test_sim_info_OBJECTS)
-unit_tests += unit/test-sim-info
+unit_test_sailfish_sim_info_LDADD = @GLIB_LIBS@ -ldl
+unit_objects += $(unit_test_sailfish_sim_info_OBJECTS)
+unit_tests += unit/test-sailfish_sim_info
 
-unit_test_sim_info_dbus_SOURCES = unit/test-sim-info-dbus.c \
+unit_test_sailfish_sim_info_dbus_SOURCES = unit/test-sailfish_sim_info_dbus.c \
 			unit/test-dbus.c unit/fake_watch.c \
-			src/sim-info.c src/sim-info-dbus.c \
+			plugins/sailfish_manager/sailfish_sim_info.c \
+			plugins/sailfish_manager/sailfish_sim_info_dbus.c \
 			gdbus/object.c \
 			src/dbus.c src/storage.c src/watchlist.c src/log.c
-unit_test_sim_info_dbus_CFLAGS = $(COVERAGE_OPT) $(AM_CFLAGS) \
+unit_test_sailfish_sim_info_dbus_CFLAGS = $(COVERAGE_OPT) $(AM_CFLAGS) \
 			@DBUS_GLIB_CFLAGS@ -DSTORAGEDIR='"/tmp/ofono"'
-unit_test_sim_info_dbus_LDADD = @DBUS_GLIB_LIBS@ @GLIB_LIBS@ -ldl
-unit_objects += $(unit_test_sim_info_dbus_OBJECTS)
-unit_tests += unit/test-sim-info-dbus
+unit_test_sailfish_sim_info_dbus_LDADD = @DBUS_GLIB_LIBS@ @GLIB_LIBS@ -ldl
+unit_objects += $(unit_test_sailfish_sim_info_dbus_OBJECTS)
+unit_tests += unit/test-sailfish_sim_info_dbus
 
-unit_test_slot_manager_SOURCES = unit/test-slot-manager.c unit/fake_watch.c \
-			src/slot-manager.c src/cell-info.c src/sim-info.c \
+unit_test_sailfish_manager_SOURCES = unit/test-sailfish_manager.c \
+			unit/fake_watch.c \
+			plugins/sailfish_manager/sailfish_manager.c \
+			plugins/sailfish_manager/sailfish_cell_info.c \
+			plugins/sailfish_manager/sailfish_sim_info.c \
 			src/storage.c src/log.c
-unit_test_slot_manager_CFLAGS = $(AM_CFLAGS) $(COVERAGE_OPT) \
+unit_test_sailfish_manager_CFLAGS = $(AM_CFLAGS) $(COVERAGE_OPT) \
 			-DSTORAGEDIR='"/tmp/ofono"'
-unit_test_slot_manager_LDADD = @GLIB_LIBS@ -ldl
-unit_objects += $(unit_test_slot_manager_OBJECTS)
-unit_tests += unit/test-slot-manager
+unit_test_sailfish_manager_LDADD = @GLIB_LIBS@ -ldl
+unit_objects += $(unit_test_sailfish_manager_OBJECTS)
+unit_tests += unit/test-sailfish_manager
 
 unit_test_watch_SOURCES = unit/test-watch.c src/watch.c \
 			src/log.c src/watchlist.c
@@ -973,6 +1045,15 @@ unit_test_watch_CFLAGS = $(AM_CFLAGS) $(COVERAGE_OPT) \
 unit_test_watch_LDADD = @GLIB_LIBS@ -ldl
 unit_objects += $(unit_test_watch_OBJECTS)
 unit_tests += unit/test-watch
+
+endif
+
+unit_test_config_SOURCES = unit/test-config.c drivers/ril/ril_util.c \
+				src/config.c src/log.c
+unit_test_config_CFLAGS = $(COVERAGE_OPT) $(AM_CFLAGS)
+unit_test_config_LDADD = @GLIB_LIBS@ -ldl
+unit_objects += $(unit_test_config_OBJECTS)
+unit_tests += unit/test-config
 
 if SAILFISH_ACCESS
 unit_test_sailfish_access_SOURCES = unit/test-sailfish_access.c \
@@ -991,12 +1072,45 @@ unit_objects += $(unit_test_dbus_access_OBJECTS)
 unit_tests += unit/test-dbus-access
 
 if RILMODEM
+if SAILFISH_RILMODEM
+
+unit_test_ril_config_SOURCES = unit/test-ril_config.c drivers/ril/ril_util.c \
+				drivers/ril/ril_config.c src/log.c
+unit_test_ril_config_CFLAGS = $(COVERAGE_OPT) $(AM_CFLAGS)
+unit_test_ril_config_LDADD = @GLIB_LIBS@ -ldl
+unit_objects += $(unit_test_ril_config_OBJECTS)
+unit_tests += unit/test-ril_config
+
+unit_test_ril_ecclist_SOURCES = unit/test-ril_ecclist.c \
+				drivers/ril/ril_ecclist.c src/log.c
+unit_test_ril_ecclist_CFLAGS = $(COVERAGE_OPT) $(AM_CFLAGS)
+unit_test_ril_ecclist_LDADD = @GLIB_LIBS@ -ldl
+unit_objects += $(unit_test_ril_ecclist_OBJECTS)
+unit_tests += unit/test-ril_ecclist
+
+unit_test_ril_util_SOURCES = unit/test-ril_util.c drivers/ril/ril_util.c \
+				src/log.c
+unit_test_ril_util_CFLAGS = $(COVERAGE_OPT) $(AM_CFLAGS)
+unit_test_ril_util_LDADD = @GLIB_LIBS@ -ldl
+unit_objects += $(unit_test_ril_util_OBJECTS)
+unit_tests += unit/test-ril_util
+
+unit_test_ril_vendor_SOURCES = unit/test-ril_vendor.c unit/fake_watch.c \
+	drivers/ril/ril_vendor.c drivers/ril/ril_vendor_mtk.c  \
+	drivers/ril/ril_util.c src/log.c
+unit_test_ril_vendor_CFLAGS = $(COVERAGE_OPT) $(AM_CFLAGS)
+unit_test_ril_vendor_LDADD = @GLIB_LIBS@ -ldl
+unit_objects += $(unit_test_ril_vendor_OBJECTS)
+unit_tests += unit/test-ril_vendor
+
+else
 unit_tests += unit/test-rilmodem-cs \
 				unit/test-rilmodem-cs \
 				unit/test-rilmodem-sms \
 				unit/test-rilmodem-cb \
 				unit/test-rilmodem-gprs
 
+endif
 endif
 
 if ELL
