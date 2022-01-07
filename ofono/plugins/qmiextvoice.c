@@ -39,7 +39,7 @@ struct qmi_voicecall_data {
 	struct ofono_phone_number dialed;
 };
 
-enum call_direction qmiext_to_ofono_direction(uint8_t qmi_direction) {
+enum ofono_call_direction qmiext_to_ofono_direction(uint8_t qmi_direction) {
 	return qmi_direction - 1;
 }
 
