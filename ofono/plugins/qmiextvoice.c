@@ -43,18 +43,26 @@ enum ofono_call_direction qmiext_to_ofono_direction(uint8_t qmi_direction) {
 	return qmi_direction - 1;
 }
 
-enum parse_error qmiext_voice_ind_call_status(
+enum parse_error qmiext_voice_call_status(
 		struct qmi_result *qmi_result,
 		struct qmiext_voice_all_call_status_ind *result)
 {
 	int err = NONE;
 	int offset;
 	uint16_t len;
+	bool ind = TRUE;
 	const struct qmiext_voice_remote_party_number *remote_party_number;
 	const struct qmiext_voice_call_information *call_information;
 
 	/* mandatory */
 	call_information = qmi_result_get(qmi_result, 0x01, &len);
+
+	/* This is so ugly! but TLV for indicator and response is different */
+	if (!call_information) {
+		call_information = qmi_result_get(qmi_result, 0x10, &len);
+		ind = FALSE;
+	}
+
 	if (call_information) {
 		/* verify the length */
 		if (len < sizeof(call_information->size))
@@ -69,7 +77,7 @@ enum parse_error qmiext_voice_ind_call_status(
 		return MISSING_MANDATORY;
 
 	/* mandatory */
-	remote_party_number = qmi_result_get(qmi_result, 0x10, &len);
+	remote_party_number = qmi_result_get(qmi_result, ind ? 0x10 : 0x11, &len);
 	if (remote_party_number) {
 		const struct qmiext_voice_remote_party_number_instance *instance;
 		int instance_size = sizeof(struct qmiext_voice_remote_party_number_instance);
@@ -445,7 +453,7 @@ static void all_call_status_ind(struct qmi_result *result, void *user_data)
 	struct qmiext_voice_all_call_status_ind status_ind;
 
 
-	if (qmiext_voice_ind_call_status(result, &status_ind) != NONE) {
+	if (qmiext_voice_call_status(result, &status_ind) != NONE) {
 		DBG("Parsing of all call status indication failed");
 		return;
 	}
@@ -514,6 +522,17 @@ static void all_call_status_ind(struct qmi_result *result, void *user_data)
 	qmiext_at_util_call_list_notify(vc, &vd->call_list, calls);
 }
 
+static void event_update(struct qmi_result *result, void *user_data)
+{
+	struct ofono_voicecall *vc = user_data;
+	struct qmi_voicecall_data *data = ofono_voicecall_get_data(vc);
+
+	DBG("");
+
+	qmi_service_send(data->voice, QMI_VOICE_GET_ALL_STATUS, NULL,
+				all_call_status_ind, vc, NULL);
+}
+
 static void create_voice_cb(struct qmi_service *service, void *user_data)
 {
 	struct ofono_voicecall *vc = user_data;
@@ -540,6 +559,9 @@ static void create_voice_cb(struct qmi_service *service, void *user_data)
 	*/
 	qmi_service_register(data->voice, QMI_VOICE_IND_ALL_STATUS,
 				all_call_status_ind, vc, NULL);
+
+	qmi_service_register(data->voice, QMI_SERVICE_UPDATE,
+					event_update, vc, NULL);
 
 	ofono_voicecall_register(vc);
 }

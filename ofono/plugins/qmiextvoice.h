@@ -45,6 +45,7 @@
 #endif
 
 #define QMI_VOICE_IND_ALL_STATUS 0x2e
+#define QMI_VOICE_GET_ALL_STATUS 0x2f
 
 struct qmiext_voice_dial_call_result {
 	bool call_id_set;

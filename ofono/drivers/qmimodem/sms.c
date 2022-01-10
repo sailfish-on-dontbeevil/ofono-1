@@ -362,6 +362,15 @@ static void raw_read_cb(struct qmi_result *result, void *user_data)
 	}
 }
 
+static void event_update(struct qmi_result *result, void *user_data)
+{
+	struct ofono_sms *sms = user_data;
+
+	DBG("");
+
+	//TODO get_msg_list(sms);
+}
+
 static void event_notify(struct qmi_result *result, void *user_data)
 {
 	struct ofono_sms *sms = user_data;
@@ -423,10 +432,13 @@ static void event_notify(struct qmi_result *result, void *user_data)
 static void set_routes_cb(struct qmi_result *result, void *user_data)
 {
 	struct ofono_sms *sms = user_data;
+	struct sms_data *data = ofono_sms_get_data(sms);
 
 	DBG("");
 
 	ofono_sms_register(sms);
+	qmi_service_register(data->wms, QMI_SERVICE_UPDATE,
+					event_update, sms, NULL);
 }
 
 static void get_routes_cb(struct qmi_result *result, void *user_data)
