@@ -163,6 +163,7 @@ int qmiext_to_ofono_status(uint8_t status, int *ret) {
 	case QMI_CALL_STATE_ORIG:
 		*ret = CALL_STATUS_DIALING;
 		break;
+	case QMI_CALL_STATE_SETUP:
 	case QMI_CALL_STATE_INCOMING:
 		*ret = CALL_STATUS_INCOMING;
 		break;
@@ -175,9 +176,6 @@ int qmiext_to_ofono_status(uint8_t status, int *ret) {
 	case QMI_CALL_STATE_ALERTING:
 		*ret = CALL_STATUS_ALERTING;
 		break;
-	case QMI_CALL_STATE_SETUP:
-		/* FIXME: unsure if _SETUP is dialing or not */
-		DBG("QMI_CALL_STATE_SETUP unsupported");
 		err = 1;
 		break;
 	case QMI_CALL_STATE_IDLE:
@@ -647,7 +645,7 @@ static void dial(struct ofono_voicecall *vc, const struct ofono_phone_number *ph
 	memcpy(&vd->dialed, ph, sizeof(*ph));
 
 	arg.call_type_set = true;
-	arg.call_type = QMI_CALL_TYPE_VOICE_FORCE;
+	arg.call_type = QMI_CALL_TYPE_VOICE;
 
 	if (!qmiext_voice_dial_call(
 				&arg,
