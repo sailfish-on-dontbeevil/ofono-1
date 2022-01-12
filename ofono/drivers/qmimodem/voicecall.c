@@ -255,7 +255,7 @@ static void dial(struct ofono_voicecall *vc, const struct ofono_phone_number *ph
 
 	cbd->user = vc;
 	arg.calling_number_set = true;
-	arg.calling_number = ph->number;
+	arg.calling_number = phone_number_to_string(ph);
 	memcpy(&vd->dialed, ph, sizeof(*ph));
 
 	arg.call_type_set = true;
