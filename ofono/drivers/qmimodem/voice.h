@@ -38,6 +38,8 @@
 /* default alphabet Language unspecific */
 #define USSD_DCS_UNSPECIFIC 0x0f
 
+#include <types.h>
+
 /* based on qmi ussd definition */
 enum qmi_ussd_dcs {
 	QMI_USSD_DCS_ASCII = 0x1,
@@ -84,9 +86,7 @@ struct qmi_ussd_data {
 	uint8_t data[0];
 } __attribute__((__packed__));
 
-enum call_direction;
-
 const char *qmi_voice_call_state_name(enum qmi_voice_call_state value);
-uint8_t ofono_to_qmi_direction(enum call_direction ofono_direction);
-enum call_direction qmi_to_ofono_direction(uint8_t qmi_direction);
+uint8_t ofono_to_qmi_direction(enum ofono_call_direction ofono_direction);
+enum ofono_call_direction qmi_to_ofono_direction(uint8_t qmi_direction);
 int qmi_to_ofono_status(uint8_t status, int *ret);
