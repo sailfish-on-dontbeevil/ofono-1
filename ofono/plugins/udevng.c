@@ -203,41 +203,45 @@ static gboolean setup_gobi(struct modem_info *modem)
 
 	DBG("%s", modem->syspath);
 
-	for (list = modem->devices; list; list = list->next) {
-		struct device_info *info = list->data;
+	if (modem->type != MODEM_TYPE_SERIAL) {
+		for (list = modem->devices; list; list = list->next) {
+			struct device_info *info = list->data;
 
-		DBG("%s %s %s %s %s %s", info->devnode, info->interface,
-						info->number, info->label,
-						info->sysattr, info->subsystem);
+			DBG("%s %s %s %s %s %s", info->devnode, info->interface,
+							info->number, info->label,
+							info->sysattr, info->subsystem);
 
-		if (g_strcmp0(info->subsystem, "usbmisc") == 0) /* cdc-wdm */
-			qmi = info->devnode;
-		else if (g_strcmp0(info->subsystem, "net") == 0) /* wwan */
-			net = info->devnode;
-		else if (g_strcmp0(info->subsystem, "tty") == 0) {
-			if (g_strcmp0(info->interface, "255/255/255") == 0) {
-				if (g_strcmp0(info->number, "00") == 0)
-					diag = info->devnode; /* ec20 */
-				else if (g_strcmp0(info->number, "01") == 0)
-					diag = info->devnode; /* gobi */
-				else if (g_strcmp0(info->number, "02") == 0)
-					mdm = info->devnode; /* gobi */
-				else if (g_strcmp0(info->number, "03") == 0)
-					gps = info->devnode; /* gobi */
-			} else if (g_strcmp0(info->interface, "255/0/0") == 0) {
-				if (g_strcmp0(info->number, "01") == 0)
-					gps = info->devnode; /* ec20 */
-				if (g_strcmp0(info->number, "02") == 0)
-					mdm = info->devnode; /* ec20 */
-				/* ignore the 3rd device second AT/mdm iface */
+			if (g_strcmp0(info->subsystem, "usbmisc") == 0) /* cdc-wdm */
+				qmi = info->devnode;
+			else if (g_strcmp0(info->subsystem, "net") == 0) /* wwan */
+				net = info->devnode;
+			else if (g_strcmp0(info->subsystem, "tty") == 0) {
+				if (g_strcmp0(info->interface, "255/255/255") == 0) {
+					if (g_strcmp0(info->number, "00") == 0)
+						diag = info->devnode; /* ec20 */
+					else if (g_strcmp0(info->number, "01") == 0)
+						diag = info->devnode; /* gobi */
+					else if (g_strcmp0(info->number, "02") == 0)
+						mdm = info->devnode; /* gobi */
+					else if (g_strcmp0(info->number, "03") == 0)
+						gps = info->devnode; /* gobi */
+				} else if (g_strcmp0(info->interface, "255/0/0") == 0) {
+					if (g_strcmp0(info->number, "01") == 0)
+						gps = info->devnode; /* ec20 */
+					if (g_strcmp0(info->number, "02") == 0)
+						mdm = info->devnode; /* ec20 */
+					/* ignore the 3rd device second AT/mdm iface */
+				}
 			}
 		}
+
+		DBG("qmi=%s net=%s mdm=%s gps=%s diag=%s", qmi, net, mdm, gps, diag);
+
+		if (qmi == NULL || mdm == NULL || net == NULL)
+			return FALSE;
+	} else {
+		qmi = modem->serial->devnode;
 	}
-
-	DBG("qmi=%s net=%s mdm=%s gps=%s diag=%s", qmi, net, mdm, gps, diag);
-
-	if (qmi == NULL || mdm == NULL || net == NULL)
-		return FALSE;
 
 
 	ofono_modem_set_string(modem->modem, "Device", qmi);
@@ -2073,6 +2077,8 @@ static void enumerate_devices(struct udev *context)
 		return;
 
 	udev_enumerate_add_match_subsystem(enumerate, "tty");
+	udev_enumerate_add_match_subsystem(enumerate, "smdpkt");
+	udev_enumerate_add_match_subsystem(enumerate, "rpmsg");
 	udev_enumerate_add_match_subsystem(enumerate, "usb");
 	udev_enumerate_add_match_subsystem(enumerate, "usbmisc");
 	udev_enumerate_add_match_subsystem(enumerate, "net");
