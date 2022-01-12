@@ -80,6 +80,7 @@ struct ofono_sim {
 	gboolean locked_pins[OFONO_SIM_PASSWORD_SIM_PUK]; /* Number of PINs */
 
 	int pin_retries[OFONO_SIM_PASSWORD_INVALID];
+	bool pin_values_dirty;
 
 	enum ofono_sim_phase phase;
 	unsigned char mnc_length;
@@ -3093,6 +3094,7 @@ void ofono_sim_inserted_notify(struct ofono_sim *sim, ofono_bool_t inserted)
 		sim->pin_retries[OFONO_SIM_PASSWORD_SIM_PUK2] = -1;
 
 		pin_cache_remove(sim->iccid);
+		sim->pin_values_dirty = 1;
 
 		sim_free_state(sim);
 	}
@@ -3379,8 +3381,10 @@ static void sim_pin_query_cb(const struct ofono_error *error,
 		return;
 	}
 
-	if (sim->pin_type != pin_type) {
-		sim->pin_type = pin_type;
+	if (sim->pin_type != pin_type || sim->pin_values_dirty) {
+ 		sim->pin_type = pin_type;
+		sim->pin_values_dirty = 0;
+		pin_name = sim_passwd_name(pin_type);
 
 		if (pin_type != OFONO_SIM_PASSWORD_NONE &&
 				password_is_pin(pin_type) == FALSE)
