@@ -76,10 +76,10 @@ int qmi_to_ofono_status(uint8_t status, int *ret) {
 	return err;
 }
 
-uint8_t ofono_to_qmi_direction(enum call_direction ofono_direction) {
+uint8_t ofono_to_qmi_direction(enum ofono_call_direction ofono_direction) {
 	return ofono_direction + 1;
 }
-enum call_direction qmi_to_ofono_direction(uint8_t qmi_direction) {
+enum ofono_call_direction qmi_to_ofono_direction(uint8_t qmi_direction) {
 	return qmi_direction - 1;
 }
 
