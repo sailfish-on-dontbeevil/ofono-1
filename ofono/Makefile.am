@@ -1013,7 +1013,8 @@ unit_tests += unit/test-rilmodem-cs \
 				unit/test-rilmodem-cs \
 				unit/test-rilmodem-sms \
 				unit/test-rilmodem-cb \
-				unit/test-rilmodem-gprs
+				unit/test-rilmodem-gprs \
+				unit/test-call-list
 
 endif
 
@@ -1071,6 +1072,12 @@ unit_test_sms_root_SOURCES = unit/test-sms-root.c \
 unit_test_sms_root_CFLAGS = -DSTORAGEDIR='"/tmp/ofono"' $(COVERAGE_OPT) $(AM_CFLAGS)
 unit_test_sms_root_LDADD = @GLIB_LIBS@
 unit_objects += $(unit_test_sms_root_OBJECTS)
+
+unit_test_call_list_SOURCES = \
+				     src/common.c src/util.c \
+				     drivers/common/call_list.c unit/test-call-list.c
+unit_test_call_list_LDADD = @GLIB_LIBS@ $(ell_ldadd)
+unit_objects += $(unit_test_call_list_OBJECTS)
 
 unit_test_mux_SOURCES = unit/test-mux.c $(gatchat_sources)
 unit_test_mux_LDADD = @GLIB_LIBS@
