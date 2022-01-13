@@ -107,6 +107,7 @@ static void gobi_debug(const char *str, void *user_data)
 /*IMEI CALLBACK*/
 static void gobi_get_ids_cb(struct qmi_result *result, void *user_data)
 {
+	ofono_info("gobi_get_ids_cb");
 	char *str;
 	struct cb_data *cbd = user_data;
 	ofono_devinfo_query_cb_t cb = cbd->cb;
@@ -612,9 +613,16 @@ static GobiPlugin *gobi_slot_driver_init(struct ofono_slot_manager *m)
 	plugin->slot_manager = m;
 
 	GobiSlot *slot = g_new0(GobiSlot, 1);
+	DBG("slot address after new %p size %d", slot, sizeof(GobiSlot));
+
 	plugin->slots = g_slist_append(plugin->slots, slot);
 
+	DBG("list length %d", g_slist_length(plugin->slots));
+
+
 	global_plugin = plugin;
+	DBG("init global_plugin address %p", global_plugin);
+
 	return plugin;
 }
 
@@ -628,7 +636,9 @@ static void gobi_slot_set_sim_state(struct ofono_sim *sim)
 	}
 
 	GobiSlot *slot = NULL;
-	slot = g_slist_nth(global_plugin->slots, 0);
+	slot = g_slist_nth(global_plugin->slots, 0)->data;
+
+	DBG("slot address %p", slot);
 
 	if (!slot) {
 		DBG("No slot yet");
@@ -669,7 +679,12 @@ static void gobi_slot_driver_startup_check()
 	}
 
 	GobiSlot *slot = NULL;
+    DBG("global_plugin address %p", global_plugin);
+	DBG("list length %d", g_list_length(global_plugin->slots));
+
 	slot = g_slist_nth(global_plugin->slots, 0);
+
+	DBG("slot pointer %p", slot);
 
 	if (!slot) {
 		DBG("No slot yet");
@@ -679,7 +694,7 @@ static void gobi_slot_driver_startup_check()
 	if (!slot->modem) {
 		slot->modem = global_modem;
 	}
-	slot->imei = imei;
+	slot->imei = &imei;
 
 	slot->handle = ofono_slot_add(global_plugin->slot_manager,
 				"/quectelqmi_0", (OFONO_RADIO_ACCESS_MODE_GSM | OFONO_RADIO_ACCESS_MODE_UMTS | OFONO_RADIO_ACCESS_MODE_LTE),
@@ -687,6 +702,7 @@ static void gobi_slot_driver_startup_check()
 				OFONO_SLOT_SIM_UNKNOWN,
 				OFONO_SLOT_NO_FLAGS);
 
+	DBG("%p", slot->handle);
 	ofono_slot_driver_started(gobi_ofono_slot_driver);
 	_started = true;
 }

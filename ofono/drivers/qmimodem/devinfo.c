@@ -116,6 +116,7 @@ static void qmi_query_revision(struct ofono_devinfo *devinfo,
 
 static void get_ids_cb(struct qmi_result *result, void *user_data)
 {
+	ofono_info("get_ids_cb");
 	struct cb_data *cbd = user_data;
 	struct ofono_devinfo *devinfo = cbd->user;
 	struct devinfo_data *data = ofono_devinfo_get_data(devinfo);

@@ -487,6 +487,7 @@ static struct ofono_slot *slot_add_internal(OfonoSlotManagerObject *mgr,
 	const char *imeisv, enum ofono_slot_sim_presence sim_presence,
 	enum ofono_slot_flags flags)
 {
+	DBG("");
 	char *enabled_slots;
 	/* Extra ref for the caller */
 	OfonoSlotObject *s = g_object_ref(g_object_new(OFONO_TYPE_SLOT, NULL));
@@ -552,11 +553,14 @@ static gboolean slot_manager_foreach_driver(OfonoSlotManagerObject *mgr,
 	gboolean (*fn)(OfonoSlotDriverReg *reg, void *user_data),
 	gconstpointer user_data)
 {
+	DBG("in slot_manager_foreach_driver");
 	GSList *l = mgr->drivers;
 	gboolean done = FALSE;
 
 	while (l && !done) {
+		DBG("in loop");
 		GSList *next = l->next;
+		DBG("data: %p", l->data);
 
 		/* The callback returns TRUE to terminate the loop */
 		done = fn((OfonoSlotDriverReg*)l->data, (void*) user_data);
@@ -972,13 +976,14 @@ static void slot_driver_reg_free(OfonoSlotDriverReg *r)
 static OfonoSlotDriverReg *slot_manager_register_driver
 	(OfonoSlotManagerObject *mgr, const struct ofono_slot_driver *d)
 {
+	DBG("slot_manager_register_driver");
 	/* Only allow registrations at startup */
 	if (mgr->init_countdown) {
 		OfonoSlotDriverReg *reg = g_new0(OfonoSlotDriverReg, 1);
 
 		reg->manager = mgr;
 		reg->driver = d;
-		mgr->drivers = g_slist_append(mgr->drivers, reg);
+		mgr->drivers = g_slist_insert(mgr->drivers, reg, 0);
 		return reg;
 	} else {
 		ofono_error("Refusing to register slot driver %s", d->name);
@@ -1273,6 +1278,7 @@ struct ofono_slot *ofono_slot_add(struct ofono_slot_manager *m,
 	const char *imeisv, enum ofono_slot_sim_presence sim_presence,
 	enum ofono_slot_flags flags)
 {
+	DBG("");
 	OfonoSlotManagerObject *mgr = slot_manager_object_cast(m);
 
 	/*
@@ -1539,6 +1545,7 @@ void __ofono_slot_manager_cleanup(void)
 OfonoSlotDriverReg *ofono_slot_driver_register
 	(const struct ofono_slot_driver *d)
 {
+	DBG("ofono_slot_driver_register");
 	if (d) {
 		/*
 		 * Let's not assume what's called first,
@@ -1547,7 +1554,6 @@ OfonoSlotDriverReg *ofono_slot_driver_register
 		if (!slot_manager) {
 			slot_manager = ofono_slot_manager_new();
 		}
-
 		return slot_manager_register_driver(slot_manager, d);
 	}
 	return NULL;
