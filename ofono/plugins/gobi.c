@@ -73,14 +73,14 @@ typedef struct ofono_slot_driver_data {
 	GSList *slots;
 } GobiPlugin;
 
-typedef struct ofono_slot_data {
+typedef struct gobi_slot_data {
 	struct ofono_slot *handle;
 	struct ofono_modem *modem;
 	GobiPlugin *plugin;
 	char *imei;
 } GobiSlot;
 
-static char *imei = "123456789012345";
+static char imei[16];
 static struct ofono_modem *global_modem = NULL;
 static GobiPlugin *global_plugin = NULL;
 static struct ofono_slot_driver_reg *gobi_ofono_slot_driver = NULL;
@@ -119,7 +119,8 @@ static void gobi_get_ids_cb(struct qmi_result *result, void *user_data)
 			return;
 		} else {
 			ofono_info("Got IMEI %s", str);
-			imei = str;
+			strncpy(imei, str, 15);
+			imei[15] = 0;
 			gobi_slot_driver_startup_check();
 		}
 	}
@@ -611,7 +612,7 @@ static GobiPlugin *gobi_slot_driver_init(struct ofono_slot_manager *m)
 	plugin->slot_manager = m;
 
 	GobiSlot *slot = g_new0(GobiSlot, 1);
-	plugin->slots = g_slist_insert(plugin->slots, slot, 0);
+	plugin->slots = g_slist_append(plugin->slots, slot);
 
 	global_plugin = plugin;
 	return plugin;
@@ -722,6 +723,9 @@ static gboolean gobi_slot_plugin_start(gpointer user_data)
 
 	/* Register the driver */
 	gobi_ofono_slot_driver = ofono_slot_driver_register(&gobi_slot_driver);
+	if (!gobi_ofono_slot_driver) {
+		DBG("ERROR registering slot driver");
+	}
 	return G_SOURCE_REMOVE;
 }
 
