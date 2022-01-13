@@ -80,7 +80,7 @@ typedef struct ofono_slot_data {
 	char *imei;
 } GobiSlot;
 
-static char *imei = "123456789012345";
+static char imei[16];
 static struct ofono_modem *global_modem = NULL;
 static GobiPlugin *global_plugin = NULL;
 static struct ofono_slot_driver_reg *gobi_ofono_slot_driver = NULL;
@@ -119,7 +119,8 @@ static void gobi_get_ids_cb(struct qmi_result *result, void *user_data)
 			return;
 		} else {
 			ofono_info("Got IMEI %s", str);
-			imei = str;
+			strncpy(imei, str, 15);
+			imei[15] = 0;
 			gobi_slot_driver_startup_check();
 		}
 	}
@@ -627,7 +628,7 @@ static void gobi_slot_set_sim_state(struct ofono_sim *sim)
 	}
 
 	GobiSlot *slot = NULL;
-	slot = g_slist_nth(global_plugin->slots, 0);
+	slot = g_slist_nth(global_plugin->slots, 0)->data;
 
 	if (!slot) {
 		DBG("No slot yet");
@@ -668,7 +669,7 @@ static void gobi_slot_driver_startup_check()
 	}
 
 	GobiSlot *slot = NULL;
-	slot = g_slist_nth(global_plugin->slots, 0);
+	slot = g_slist_nth(global_plugin->slots, 0)->data;
 
 	if (!slot) {
 		DBG("No slot yet");
