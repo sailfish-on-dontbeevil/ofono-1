@@ -1,6 +1,8 @@
 
 AM_MAKEFLAGS = --no-print-directory
 
+ACLOCAL_AMFLAGS = -I build-aux
+
 noinst_LTLIBRARIES =
 
 pkginclude_HEADERS = include/log.h include/plugin.h include/history.h \
