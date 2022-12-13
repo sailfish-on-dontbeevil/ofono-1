@@ -1844,6 +1844,7 @@ static struct {
 	{ "quectelqmi",	"qcserial",	"2c7c", "0121"	},
 	{ "quectelqmi",	"qmi_wwan",	"2c7c", "0125"	},
 	{ "quectelqmi",	"qcserial",	"2c7c", "0125"	},
+	{ "quectelqmi",	"option",	"2c7c", "0125"	},
 	{ "quectelqmi",	"qmi_wwan",	"2c7c", "0296"	},
 	{ "quectelqmi",	"qcserial",	"2c7c", "0296"	},
 	{ "ublox",	"cdc_acm",	"1546", "1010"	},
@@ -1873,16 +1874,26 @@ static void check_usb_device(struct udev_device *device)
 	const char *syspath, *devname, *driver;
 	const char *vendor = NULL, *model = NULL;
 
+	const char* devsyspath = udev_device_get_syspath(device);
+	if (devsyspath == NULL) {
+		return;
+	}
+	DBG("devsyspath: %s", devsyspath);
+
+
 	usb_device = udev_device_get_parent_with_subsystem_devtype(device,
 							"usb", "usb_device");
 	if (usb_device == NULL)
 		return;
 
 	syspath = udev_device_get_syspath(usb_device);
+	DBG("Syspath: %s", syspath);
 	if (syspath == NULL)
 		return;
 
 	devname = udev_device_get_devnode(usb_device);
+	DBG("devname: %s", devname);
+
 	if (devname == NULL)
 		return;
 
@@ -1890,6 +1901,7 @@ static void check_usb_device(struct udev_device *device)
 	model = udev_device_get_property_value(usb_device, "ID_MODEL_ID");
 
 	driver = udev_device_get_property_value(usb_device, "OFONO_DRIVER");
+
 	if (!driver) {
 		struct udev_device *usb_interface =
 			udev_device_get_parent_with_subsystem_devtype(
@@ -1945,10 +1957,39 @@ static void check_usb_device(struct udev_device *device)
 
 		if (driver == NULL)
 			return;
+
+		add_device(syspath, devname, driver, vendor, model, device,
+			MODEM_TYPE_USB);
+		return;
 	}
 
-	add_device(syspath, devname, driver, vendor, model, device,
-			MODEM_TYPE_USB);
+	//Now handle device as opposed to parent device
+	driver = udev_device_get_property_value(device, "ID_USB_DRIVER");
+	DBG("driver: %s", driver);
+
+	for (unsigned int i = 0; vendor_list[i].driver; i++) {
+		if (g_str_equal(vendor_list[i].drv, driver) == FALSE)
+			continue;
+
+		if (vendor_list[i].vid) {
+			if (!g_str_equal(vendor_list[i].vid, vendor))
+				continue;
+		}
+
+		if (vendor_list[i].pid) {
+			if (!g_str_equal(vendor_list[i].pid, model))
+				continue;
+		}
+
+		driver = vendor_list[i].driver;
+	}
+
+	if (driver == NULL)
+		return;
+
+	add_device(devsyspath, devname, driver, vendor, model, device,
+		MODEM_TYPE_USB);
+
 }
 
 static const struct {
