@@ -36,6 +36,7 @@
 #include <glib.h>
 
 #include <ofono/log.h>
+#include <gatchat.h>
 
 #include "qmi.h"
 #include "ctl.h"
@@ -82,6 +83,7 @@ struct qmi_device {
 	guint shutdown_source;
 	bool shutting_down : 1;
 	bool destroyed : 1;
+	GAtChat *atmodem;
 };
 
 struct qmi_service {
@@ -1154,6 +1156,22 @@ bool qmi_device_has_service(struct qmi_device *device, uint8_t type)
 	}
 
 	return false;
+}
+
+void qmi_device_set_atmodem(struct qmi_device *device, GAtChat* atmodem)
+{
+	if (device == NULL)
+		return;
+
+	device->atmodem = atmodem;
+}
+
+GAtChat* qmi_device_get_atmodem(struct qmi_device *device)
+{
+	if (device == NULL)
+		return NULL;
+
+	return device->atmodem;
 }
 
 struct discover_data {

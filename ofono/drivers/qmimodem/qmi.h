@@ -24,6 +24,7 @@
 
 #include <stdbool.h>
 #include <stdint.h>
+#include <gatchat.h>
 
 #define QMI_SERVICE_CONTROL	0	/* Control service */
 #define QMI_SERVICE_WDS		1	/* Wireless data service */
@@ -108,6 +109,9 @@ enum qmi_device_expected_data_format qmi_device_get_expected_data_format(
 						struct qmi_device *device);
 bool qmi_device_set_expected_data_format(struct qmi_device *device,
 			enum qmi_device_expected_data_format format);
+
+void qmi_device_set_atmodem(struct qmi_device *device, GAtChat* atmodem);
+GAtChat* qmi_device_get_atmodem(struct qmi_device *device);
 
 struct qmi_param;
 
