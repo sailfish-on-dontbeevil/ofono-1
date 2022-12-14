@@ -49,6 +49,9 @@
 #include <ofono/message-waiting.h>
 #include <ofono/slot.h>
 
+#include <gatchat.h>
+#include <drivers/atmodem/vendor.h>
+
 #include <drivers/qmimodem/qmi.h>
 #include <drivers/qmimodem/dms.h>
 #include <drivers/qmimodem/wda.h>
@@ -393,6 +396,16 @@ static int gobi_enable(struct ofono_modem *modem)
 		qmi_device_set_debug(data->device, gobi_debug, "QMI: ");
 
 	qmi_device_set_close_on_unref(data->device, true);
+
+
+	//Get a handle to an AT interface if one was found, and attach it to the qmi_device
+	GAtChat *atchat = at_util_open_device(modem, "Aux", NULL, "Aux: ", NULL);
+	if (!atchat) {
+		DBG("No Aux");
+	} else {
+		DBG("Have atmodem");
+	}
+	qmi_device_set_atmodem(data->device, atchat);
 
 	qmi_device_discover(data->device, discover_cb, modem, NULL);
 
