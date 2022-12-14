@@ -2708,7 +2708,7 @@ void ofono_voicecall_disconnected(struct ofono_voicecall *vc, int id,
 
 	vc->release_list = g_slist_remove(vc->release_list, call);
 
-	if (reason != OFONO_DISCONNECT_REASON_UNKNOWN)
+	//if (reason != OFONO_DISCONNECT_REASON_UNKNOWN)
 		voicecall_emit_disconnect_reason(call, reason);
 
 	number = phone_number_to_string(&call->call->phone_number);
