@@ -30,10 +30,15 @@
 #include <ofono/modem.h>
 #include <ofono/sms.h>
 
+#include <gatchat.h>
+#include <drivers/atmodem/vendor.h>
+
 #include "qmi.h"
 #include "wms.h"
 
 #include "qmimodem.h"
+
+#include <gatchat.h>
 
 struct sms_data {
 	struct qmi_service *wms;
@@ -45,6 +50,7 @@ struct sms_data {
 	uint8_t msg_mode;
 	bool msg_mode_all;
 	bool msg_list_chk;
+	GAtChat *atmodem;
 };
 
 static void get_msg_list(struct ofono_sms *sms);
@@ -815,6 +821,15 @@ done:
 	ofono_sms_register(sms);
 }
 
+static void qmi_sms_at_notify(GAtResult *result, gpointer user_data)
+{
+	struct ofono_sms *sms = user_data;
+
+	DBG("");
+
+	get_msg_list(sms);
+}
+
 static int qmi_sms_probe(struct ofono_sms *sms,
 				unsigned int vendor, void *user_data)
 {
@@ -828,6 +843,12 @@ static int qmi_sms_probe(struct ofono_sms *sms,
 	ofono_sms_set_data(sms, data);
 
 	qmi_service_create(device, QMI_SERVICE_WMS, create_wms_cb, sms, NULL);
+
+	GAtChat* atmodem = qmi_device_get_atmodem(device);
+	if (atmodem) {
+		guint ret = g_at_chat_register(atmodem, "+CMTI:", qmi_sms_at_notify, FALSE, sms, NULL);
+		DBG("SMS AT CHAT REGISTER %d", ret);
+	}
 
 	return 0;
 }

@@ -40,7 +40,6 @@
 #include "voice_generated.h"
 
 #include <gatchat.h>
-#include <drivers/atmodem/vendor.h>
 
 #ifndef ARRAY_SIZE
 #define ARRAY_SIZE(x) (sizeof(x) / sizeof((x)[0]))
@@ -54,7 +53,6 @@
 
 struct voicecall_data {
 	struct qmi_service *voice;
-	GAtChat *atmodem;
 	uint16_t major;
 	uint16_t minor;
 	GSList *call_list;
@@ -177,7 +175,7 @@ static void create_voice_cb(struct qmi_service *service, void *user_data)
 	ofono_voicecall_register(vc);
 }
 
-static void ring_notify(GAtResult *result, gpointer user_data) {
+static void qmi_voicecall_ring_notify(GAtResult *result, gpointer user_data) {
 	struct ofono_voicecall *vc = user_data;
 	struct voicecall_data *data = ofono_voicecall_get_data(vc);
 
@@ -193,7 +191,6 @@ static int qmi_voicecall_probe(struct ofono_voicecall *vc,
 {
 	struct qmi_device *device = user_data;
 	struct voicecall_data *data;
-	struct ofono_modem *modem = ofono_voicecall_get_modem(vc);
 
 	DBG("");
 
@@ -204,17 +201,11 @@ static int qmi_voicecall_probe(struct ofono_voicecall *vc,
 	qmi_service_create(device, QMI_SERVICE_VOICE,
 					create_voice_cb, vc, NULL);
 
-	//PINEPHONE HACK
-	data->atmodem = at_util_open_device(modem, "Aux", NULL, "Aux: ", NULL);
-	if (data->atmodem == NULL) {
-		DBG("No Aux");
-		return -EINVAL;
+	GAtChat* atmodem = qmi_device_get_atmodem(device);
+	if (atmodem) {
+		guint ret = g_at_chat_register(atmodem, "RING", qmi_voicecall_ring_notify, FALSE, vc, NULL);
+		DBG("VOICE AT CHAT REGISTER %d", ret);
 	}
-	DBG("Have atmodem");
-
-	guint ret = g_at_chat_register(data->atmodem, "RING", ring_notify, FALSE, vc, NULL);
-
-	DBG("AT CHAT REGISTER %d", ret);
 
 	return 0;
 }
