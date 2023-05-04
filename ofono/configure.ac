@@ -1,5 +1,5 @@
-AC_PREREQ(2.60)
-AC_INIT(ofono, 1.33)
+AC_PREREQ(2.69)
+AC_INIT(ofono, 1.34)
 
 AM_INIT_AUTOMAKE([foreign subdir-objects color-tests])
 AC_CONFIG_HEADERS(config.h)
@@ -30,14 +30,14 @@ m4_ifdef([AC_LIBTOOL_TAGS], [AC_LIBTOOL_TAGS([])])
 AC_DISABLE_STATIC
 LT_INIT
 
-AC_ARG_ENABLE(optimization, AC_HELP_STRING([--disable-optimization],
+AC_ARG_ENABLE(optimization, AS_HELP_STRING([--disable-optimization],
 			[disable code optimization through compiler]), [
 	if (test "${enableval}" = "no"); then
 		CFLAGS="$CFLAGS -O0 -U_FORTIFY_SOURCE"
 	fi
 ])
 
-AC_ARG_ENABLE(debug, AC_HELP_STRING([--enable-debug],
+AC_ARG_ENABLE(debug, AS_HELP_STRING([--enable-debug],
 			[enable compiling with debugging information]), [
 	if (test "${enableval}" = "yes" &&
 				test "${ac_cv_prog_cc_g}" = "yes"); then
@@ -46,7 +46,7 @@ AC_ARG_ENABLE(debug, AC_HELP_STRING([--enable-debug],
 	fi
 ])
 
-AC_ARG_ENABLE(pie, AC_HELP_STRING([--enable-pie],
+AC_ARG_ENABLE(pie, AS_HELP_STRING([--enable-pie],
 			[enable position independent executables flag]), [
 	if (test "${enableval}" = "yes" &&
 				test "${ac_cv_prog_cc_pie}" = "yes"); then
@@ -89,7 +89,7 @@ PKG_CHECK_MODULES(DBUS, dbus-1 >= 1.6, dummy=yes,
 AC_SUBST(DBUS_CFLAGS)
 AC_SUBST(DBUS_LIBS)
 
-AC_ARG_WITH(dbusconfdir, AC_HELP_STRING([--with-dbusconfdir=PATH],
+AC_ARG_WITH(dbusconfdir, AS_HELP_STRING([--with-dbusconfdir=PATH],
 	[path to D-Bus config directory]), [path_dbusconf=${withval}],
 		[path_dbusconf="`$PKG_CONFIG --variable=sysconfdir dbus-1`"])
 if (test -z "${path_dbusconf}"); then
@@ -99,7 +99,7 @@ else
 fi
 AC_SUBST(DBUS_CONFDIR)
 
-AC_ARG_WITH(dbusdatadir, AC_HELP_STRING([--with-dbusdatadir=PATH],
+AC_ARG_WITH(dbusdatadir, AS_HELP_STRING([--with-dbusdatadir=PATH],
 	[path to D-Bus data directory]), [path_dbusdata=${withval}],
 		[path_dbusdata="`$PKG_CONFIG --variable=datadir dbus-1`"])
 if (test -z "${path_dbusdata}"); then
@@ -109,7 +109,7 @@ else
 fi
 AC_SUBST(DBUS_DATADIR)
 
-AC_ARG_WITH([systemdunitdir], AC_HELP_STRING([--with-systemdunitdir=DIR],
+AC_ARG_WITH([systemdunitdir], AS_HELP_STRING([--with-systemdunitdir=DIR],
 	[path to systemd service directory]), [path_systemdunit=${withval}],
 		[path_systemdunit="`$PKG_CONFIG --variable=systemdsystemunitdir systemd`"])
 if (test -n "${path_systemdunit}"); then
@@ -118,19 +118,19 @@ if (test -n "${path_systemdunit}"); then
 fi
 AM_CONDITIONAL(SYSTEMD, test -n "${path_systemdunit}")
 
-AC_ARG_ENABLE(test, AC_HELP_STRING([--enable-test],
+AC_ARG_ENABLE(test, AS_HELP_STRING([--enable-test],
 		[enable test/example scripts]), [enable_test=${enableval}])
 AM_CONDITIONAL(TEST, test "${enable_test}" = "yes")
 
-AC_ARG_ENABLE(tools, AC_HELP_STRING([--enable-tools],
+AC_ARG_ENABLE(tools, AS_HELP_STRING([--enable-tools],
 		[enable testing tools]), [enable_tools=${enableval}])
 AM_CONDITIONAL(TOOLS, test "${enable_tools}" = "yes")
 
-AC_ARG_ENABLE(dundee, AC_HELP_STRING([--enable-dundee],
+AC_ARG_ENABLE(dundee, AS_HELP_STRING([--enable-dundee],
 		[enable dialup deamon support]), [enable_dundee=${enableval}])
 AM_CONDITIONAL(DUNDEE, test "${enable_dundee}" = "yes")
 
-AC_ARG_ENABLE(udev, AC_HELP_STRING([--disable-udev],
+AC_ARG_ENABLE(udev, AS_HELP_STRING([--disable-udev],
 			[disable udev modem detection support]),
 						[enable_udev=${enableval}])
 if (test "${enable_udev}" != "no"); then
@@ -148,34 +148,34 @@ AC_SUBST(UDEV_CFLAGS)
 AC_SUBST(UDEV_LIBS)
 AM_CONDITIONAL(UDEV, test "${enable_udev}" = "yes")
 
-AC_ARG_ENABLE(atmodem, AC_HELP_STRING([--disable-atmodem],
+AC_ARG_ENABLE(atmodem, AS_HELP_STRING([--disable-atmodem],
 				[disable ETSI AT modem support]),
 					[enable_atmodem=${enableval}])
 AM_CONDITIONAL(ATMODEM, test "${enable_atmodem}" != "no")
 
-AC_ARG_ENABLE(cdmamodem, AC_HELP_STRING([--disable-cdmamodem],
+AC_ARG_ENABLE(cdmamodem, AS_HELP_STRING([--disable-cdmamodem],
 				[disable CDMA AT modem support]),
 					[enable_cdmamodem=${enableval}])
 AM_CONDITIONAL(CDMAMODEM, test "${enable_cdmamodem}" != "no")
 
-AC_ARG_ENABLE(phonesim, AC_HELP_STRING([--disable-phonesim],
+AC_ARG_ENABLE(phonesim, AS_HELP_STRING([--disable-phonesim],
 				[disable Phone simulator support]),
 					[enable_phonesim=${enableval}])
 AM_CONDITIONAL(PHONESIM, test "${enable_phonesim}" != "no" &&
 					test "${enable_atmodem}" != "no")
 
-AC_ARG_ENABLE(isimodem, AC_HELP_STRING([--disable-isimodem],
+AC_ARG_ENABLE(isimodem, AS_HELP_STRING([--disable-isimodem],
 				[disable PhoNet/ISI modem support]),
 					[enable_isimodem=${enableval}])
 AM_CONDITIONAL(ISIMODEM, test "${enable_isimodem}" != "no")
 
-AC_ARG_ENABLE(rilmodem, AC_HELP_STRING([--disable-rilmodem],
+AC_ARG_ENABLE(rilmodem, AS_HELP_STRING([--disable-rilmodem],
                                 [disable RIL modem support]),
                                         [enable_rilmodem=${enableval}])
 AM_CONDITIONAL(RILMODEM, test "${enable_rilmodem}" != "no")
 
 AC_ARG_ENABLE(extra-modems,
-		AC_HELP_STRING([--enable-extra-modems],
+		AS_HELP_STRING([--enable-extra-modems],
 			[enable modems not used by Sailfish OS]),
 					[enable_extra_modems=${enableval}])
 AM_CONDITIONAL(EXTRA_MODEMS, test "${enable_extra_modems}" = "yes")
@@ -190,7 +190,7 @@ PKG_CHECK_MODULES(DBUS_GLIB, dbus-glib-1, dummy=yes,
 		AC_SUBST(DBUS_GLIB_CFLAGS)
 		AC_SUBST(DBUS_GLIB_LIBS)
 
-AC_ARG_ENABLE(add-remove-context, AC_HELP_STRING([--disable-add-remove-context],
+AC_ARG_ENABLE(add-remove-context, AS_HELP_STRING([--disable-add-remove-context],
 		[don't allow to add or remove connection context over D-Bus]), [
 	if (test "${enableval}" = "no"); then
 		CFLAGS="$CFLAGS -DDISABLE_ADD_REMOVE_CONTEXT"
@@ -198,21 +198,21 @@ AC_ARG_ENABLE(add-remove-context, AC_HELP_STRING([--disable-add-remove-context],
 ])
 
 AC_ARG_ENABLE(test-coverage,
-	AC_HELP_STRING([--enable-test-coverage], [enable test code coverage]),
+	AS_HELP_STRING([--enable-test-coverage], [enable test code coverage]),
 				[enable_test_coverage=${enableval}],
 					[enable_test_coverage="no"])
 AM_CONDITIONAL(TEST_COVERAGE, test "${enable_test_coverage}" != "no")
 
-AC_ARG_ENABLE(qmimodem, AC_HELP_STRING([--disable-qmimodem],
+AC_ARG_ENABLE(qmimodem, AS_HELP_STRING([--disable-qmimodem],
 				[disable Qualcomm QMI modem support]),
 					[enable_qmimodem=${enableval}])
 AM_CONDITIONAL(QMIMODEM, test "${enable_qmimodem}" != "no")
 
-AC_ARG_ENABLE(bluetooth, AC_HELP_STRING([--disable-bluetooth],
+AC_ARG_ENABLE(bluetooth, AS_HELP_STRING([--disable-bluetooth],
 				[disable BlueZ 4 and BlueZ 5 plugins support]),
 					[enable_bluetooth=${enableval}])
 
-AC_ARG_ENABLE(bluez4, AC_HELP_STRING([--enable-bluez4],
+AC_ARG_ENABLE(bluez4, AS_HELP_STRING([--enable-bluez4],
 				[enable BlueZ 4 plugins support prior to BlueZ 5]),
 					[enable_bluez4=${enableval}])
 
@@ -226,17 +226,17 @@ fi
 AM_CONDITIONAL(BLUEZ4, test "${enable_bluetooth}" != "no" && test "${enable_bluez4}" = "yes")
 AM_CONDITIONAL(BLUETOOTH, test "${enable_bluetooth}" != "no")
 
-AC_ARG_ENABLE(sailfish-bt, AC_HELP_STRING([--enable-sailfish-bt],
+AC_ARG_ENABLE(sailfish-bt, AS_HELP_STRING([--enable-sailfish-bt],
 			[enable Sailfish OS Bluetooth plugin]),
 					[enable_sailfish_bt=${enableval}])
 AM_CONDITIONAL(SAILFISH_BT, test "${enable_sailfish_bt}" = "yes")
 
-AC_ARG_ENABLE(sailfish-provision, AC_HELP_STRING([--enable-sailfish-provision],
+AC_ARG_ENABLE(sailfish-provision, AS_HELP_STRING([--enable-sailfish-provision],
 			[enable Sailfish OS provisioning plugin]),
 				[enable_sailfish_provision=${enableval}])
 AM_CONDITIONAL(SAILFISH_PROVISION, test "${enable_sailfish_provision=$}" = "yes")
 
-AC_ARG_ENABLE(nettime, AC_HELP_STRING([--disable-nettime],
+AC_ARG_ENABLE(nettime, AS_HELP_STRING([--disable-nettime],
                                 [disable Nettime plugin]),
                                         [enable_nettime=${enableval}])
 if (test "${enable_nettime}" != "no"); then
@@ -244,10 +244,10 @@ if (test "${enable_nettime}" != "no"); then
 fi
 AM_CONDITIONAL(NETTIME, test "${enable_nettime}" != "no")
 
-AC_ARG_WITH([provisiondb], AC_HELP_STRING([--with-provisiondb=FILE],
+AC_ARG_WITH([provisiondb], AS_HELP_STRING([--with-provisiondb=FILE],
 	[location of provision database]), [path_provisiondb=${withval}])
 
-AC_ARG_ENABLE(provision, AC_HELP_STRING([--disable-provision],
+AC_ARG_ENABLE(provision, AS_HELP_STRING([--disable-provision],
 				[disable provisioning support]),
 					[enable_provision=${enableval}])
 if (test "${enable_provision}" != "no"); then
@@ -268,16 +268,16 @@ if (test "${enable_provision}" != "no"); then
 fi
 AM_CONDITIONAL(PROVISION, test "${enable_provision}" != "no")
 
-AC_ARG_ENABLE(upower, AC_HELP_STRING([--disable-upower],
+AC_ARG_ENABLE(upower, AS_HELP_STRING([--disable-upower],
 			[disable UPower plugin]),
 					[enable_upower=${enableval}])
 AM_CONDITIONAL(UPOWER, test "${enable_power}" != "no")
 
-AC_ARG_ENABLE(mbimmodem, AC_HELP_STRING([--enable-mbimmodem],
+AC_ARG_ENABLE(mbimmodem, AS_HELP_STRING([--enable-mbimmodem],
 				[enable MBIM based modem support]),
 					[enable_mbimmodem=${enableval}])
 
-AC_ARG_ENABLE(ell, AC_HELP_STRING([--enable-ell],
+AC_ARG_ENABLE(ell, AS_HELP_STRING([--enable-ell],
 				[enable support for ell]),
 					[enable_ell=${enableval}])
 
@@ -292,12 +292,12 @@ fi
 AM_CONDITIONAL(MBIMMODEM, test "${enable_ell}" != "no" && test "${enable_mbimmodem}" = "yes")
 AM_CONDITIONAL(ELL, test "${enable_ell}" != "no")
 
-AC_ARG_ENABLE(datafiles, AC_HELP_STRING([--disable-datafiles],
+AC_ARG_ENABLE(datafiles, AS_HELP_STRING([--disable-datafiles],
 			[do not install configuration and data files]),
 					[enable_datafiles=${enableval}])
 AM_CONDITIONAL(DATAFILES, test "${enable_datafiles}" != "no")
 
-AC_ARG_ENABLE(sailfish-pushforwarder, AC_HELP_STRING([--enable-sailfish-pushforwarder],
+AC_ARG_ENABLE(sailfish-pushforwarder, AS_HELP_STRING([--enable-sailfish-pushforwarder],
 			[enable Sailfish OS push forwarder plugin]),
 			[enable_sailfish_pushforwarder=${enableval}],
 			[enable_sailfish_pushforwarder="no"])
@@ -309,7 +309,7 @@ if (test "${enable_sailfish_pushforwarder}" != "no"); then
 	LIBS="$LIBS $WSPCODEC_LIBS"
 fi
 
-AC_ARG_ENABLE(sailfish-access, AC_HELP_STRING([--enable-sailfish-access],
+AC_ARG_ENABLE(sailfish-access, AS_HELP_STRING([--enable-sailfish-access],
 			[enable Sailfish OS access plugin]),
 			[enable_sailfish_access=${enableval}],
 			[enable_sailfish_access="no"])
@@ -322,7 +322,7 @@ if (test "${enable_sailfish_access}" == "yes"); then
 	LIBS="$LIBS $DBUSACCESS_LIBS"
 fi
 
-AC_ARG_ENABLE(sailfish-debuglog, AC_HELP_STRING([--enable-sailfish-debuglog],
+AC_ARG_ENABLE(sailfish-debuglog, AS_HELP_STRING([--enable-sailfish-debuglog],
 			[enable Sailfish OS debug log plugin]),
 			[enable_sailfish_debuglog=${enableval}],
 			[enable_sailfish_debuglog="no"])
@@ -359,5 +359,7 @@ fi
 AC_DEFINE_UNQUOTED(CONFIGDIR, "${configdir}",
 			[Directory for the configuration files])
 
-AC_OUTPUT(Makefile include/version.h src/ofono.service ofono.pc \
-		dundee/dundee.service)
+AC_CONFIG_FILES(Makefile include/version.h src/ofono.service ofono.pc \
+			dundee/dundee.service)
+
+AC_OUTPUT
