@@ -1697,7 +1697,7 @@ struct qmi_param *qmi_param_new(void)
 {
 	struct qmi_param *param;
 
-	param = g_try_new0(struct qmi_param, 1);
+	param = g_new0(struct qmi_param, 1);
 	if (!param)
 		return NULL;
 
@@ -1780,8 +1780,6 @@ struct qmi_param *qmi_param_new_uint8(uint8_t type, uint8_t value)
 	struct qmi_param *param;
 
 	param = qmi_param_new();
-	if (!param)
-		return NULL;
 
 	if (!qmi_param_append_uint8(param, type, value)) {
 		qmi_param_free(param);
@@ -1796,8 +1794,6 @@ struct qmi_param *qmi_param_new_uint16(uint8_t type, uint16_t value)
 	struct qmi_param *param;
 
 	param = qmi_param_new();
-	if (!param)
-		return NULL;
 
 	if (!qmi_param_append_uint16(param, type, value)) {
 		qmi_param_free(param);
@@ -1812,8 +1808,6 @@ struct qmi_param *qmi_param_new_uint32(uint8_t type, uint32_t value)
 	struct qmi_param *param;
 
 	param = qmi_param_new();
-	if (!param)
-		return NULL;
 
 	if (!qmi_param_append_uint32(param, type, value)) {
 		qmi_param_free(param);
