@@ -53,7 +53,7 @@ struct modem_info {
 	enum modem_type type;
 	union {
 		GSList *devices;
-		struct serial_device_info* serial;
+		struct serial_device_info *serial;
 	};
 	struct ofono_modem *modem;
 	const char *sysattr;
@@ -73,7 +73,7 @@ struct serial_device_info {
 	char *devpath;
 	char *devnode;
 	char *subsystem;
-	struct udev_device* dev;
+	struct udev_device *dev;
 };
 
 static gboolean setup_isi(struct modem_info *modem)
@@ -995,6 +995,7 @@ static gboolean setup_quectelqmi(struct modem_info *modem)
 
 	if (gps)
 		ofono_modem_set_string(modem->modem, "GPS", gps);
+
 	if (aux)
 		ofono_modem_set_string(modem->modem, "Aux", aux);
 
@@ -1042,9 +1043,9 @@ static gboolean setup_mbim(struct modem_info *modem)
 	return TRUE;
 }
 
-static gboolean setup_serial_modem(struct modem_info* modem)
+static gboolean setup_serial_modem(struct modem_info *modem)
 {
-	struct serial_device_info* info;
+	struct serial_device_info *info;
 
 	info = modem->serial;
 
@@ -1053,23 +1054,23 @@ static gboolean setup_serial_modem(struct modem_info* modem)
 	return TRUE;
 }
 
-static gboolean setup_tc65(struct modem_info* modem)
+static gboolean setup_tc65(struct modem_info *modem)
 {
 	ofono_modem_set_driver(modem->modem, "cinterion");
 
 	return setup_serial_modem(modem);
 }
 
-static gboolean setup_ehs6(struct modem_info* modem)
+static gboolean setup_ehs6(struct modem_info *modem)
 {
 	ofono_modem_set_driver(modem->modem, "cinterion");
 
 	return setup_serial_modem(modem);
 }
 
-static gboolean setup_ifx(struct modem_info* modem)
+static gboolean setup_ifx(struct modem_info *modem)
 {
-	struct serial_device_info* info;
+	struct serial_device_info *info;
 	const char *value;
 
 	info = modem->serial;
@@ -1091,9 +1092,9 @@ static gboolean setup_ifx(struct modem_info* modem)
 	return TRUE;
 }
 
-static gboolean setup_wavecom(struct modem_info* modem)
+static gboolean setup_wavecom(struct modem_info *modem)
 {
-	struct serial_device_info* info;
+	struct serial_device_info *info;
 	const char *value;
 
 	info = modem->serial;
@@ -1108,9 +1109,9 @@ static gboolean setup_wavecom(struct modem_info* modem)
 	return TRUE;
 }
 
-static gboolean setup_isi_serial(struct modem_info* modem)
+static gboolean setup_isi_serial(struct modem_info *modem)
 {
-	struct serial_device_info* info;
+	struct serial_device_info *info;
 	const char *value;
 
 	info = modem->serial;
@@ -1198,7 +1199,7 @@ static gboolean setup_ublox(struct modem_info *modem)
 	return TRUE;
 }
 
-static gboolean setup_gemalto(struct modem_info* modem)
+static gboolean setup_gemalto(struct modem_info *modem)
 {
 	const char *app = NULL, *gps = NULL, *mdm = NULL,
 		*net = NULL, *qmi = NULL, *net2 = NULL;
@@ -1476,7 +1477,7 @@ static const char *get_sysattr(const char *driver)
 	return NULL;
 }
 
-static void device_info_free(struct device_info* info)
+static void device_info_free(struct device_info *info)
 {
 	g_free(info->devpath);
 	g_free(info->devnode);
@@ -1488,7 +1489,7 @@ static void device_info_free(struct device_info* info)
 	g_free(info);
 }
 
-static void serial_device_info_free(struct serial_device_info* info)
+static void serial_device_info_free(struct serial_device_info *info)
 {
 	g_free(info->devpath);
 	g_free(info->devnode);
@@ -1587,9 +1588,9 @@ static gint compare_device(gconstpointer a, gconstpointer b)
  * through the device hierarchy.
  *
  */
-static struct udev_device* get_serial_modem_device(struct udev_device *dev)
+static struct udev_device *get_serial_modem_device(struct udev_device *dev)
 {
-	const char* driver;
+	const char *driver;
 
 	while (dev) {
 		driver = udev_device_get_property_value(dev, "OFONO_DRIVER");
@@ -1618,8 +1619,8 @@ static void add_serial_device(struct udev_device *dev)
 	struct modem_info *modem;
 	struct serial_device_info *info;
 	const char *subsystem;
-	struct udev_device* mdev;
-	const char* driver;
+	struct udev_device *mdev;
+	const char *driver;
 
 	mdev = get_serial_modem_device(dev);
 	if (!mdev)
@@ -2044,6 +2045,7 @@ static void check_pci_device(struct udev_device *device)
 	add_device(syspath, devname, driver, vendor, model, device,
 			MODEM_TYPE_PCIE);
 }
+
 static void check_device(struct udev_device *device)
 {
 	const char *bus;
