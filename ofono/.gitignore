@@ -46,7 +46,6 @@ unit/test-cell-info
 unit/test-cell-info-control
 unit/test-cell-info-dbus
 unit/test-stkutil
-unit/test-cdmasms
 unit/test-conf
 unit/test-dbus-access
 unit/test-dbus-clients
