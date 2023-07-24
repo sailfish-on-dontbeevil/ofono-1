@@ -38,7 +38,6 @@ typedef void (*ofono_stk_generic_cb_t)(const struct ofono_error *error,
 					void *data);
 
 struct ofono_stk_driver {
-	const char *name;
 	int (*probe)(struct ofono_stk *stk, unsigned int vendor, void *data);
 	void (*remove)(struct ofono_stk *stk);
 	void (*envelope)(struct ofono_stk *stk,
@@ -50,9 +49,6 @@ struct ofono_stk_driver {
 	void (*user_confirmation)(struct ofono_stk *stk, ofono_bool_t confirm);
 	void (*ready)(struct ofono_stk *stk);
 };
-
-int ofono_stk_driver_register(const struct ofono_stk_driver *d);
-void ofono_stk_driver_unregister(const struct ofono_stk_driver *d);
 
 struct ofono_stk *ofono_stk_create(struct ofono_modem *modem,
 					unsigned int vendor,
