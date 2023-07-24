@@ -50,6 +50,22 @@ typedef ofono_bool_t (*ofono_modem_compare_cb_t)(struct ofono_modem *modem,
 typedef void (*ofono_modemwatch_cb_t)(struct ofono_modem *modem,
 		ofono_bool_t added, void *data); /* Since mer/1.25+git2 */
 
+struct ofono_atom_driver_desc {
+	const char *name;
+	const void *driver;
+} __attribute__((aligned(8)));
+
+#define OFONO_ATOM_DRIVER_BUILTIN(type, name, driver)			\
+	_Pragma("GCC diagnostic push")					\
+	_Pragma("GCC diagnostic ignored \"-Wattributes\"")		\
+	static struct ofono_atom_driver_desc				\
+		__ofono_builtin_ ## type ## _ ##name			\
+		__attribute__((used, retain, section("__" #type),	\
+				aligned(8))) = {			\
+			#name, driver					\
+		};							\
+	_Pragma("GCC diagnostic pop")
+
 struct ofono_modem_driver {
 	const char *name;
 	enum ofono_modem_type modem_type;
