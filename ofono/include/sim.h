@@ -143,7 +143,6 @@ typedef void (*ofono_sim_set_active_card_slot_cb_t)(
 					void *data);
 
 struct ofono_sim_driver {
-	const char *name;
 	int (*probe)(struct ofono_sim *sim, unsigned int vendor, void *data);
 	void (*remove)(struct ofono_sim *sim);
 	void (*read_file_info)(struct ofono_sim *sim, int fileid,
@@ -222,9 +221,6 @@ struct ofono_sim_driver {
 			unsigned int len, ofono_sim_open_channel_cb_t cb,
 			void *data);
 };
-
-int ofono_sim_driver_register(const struct ofono_sim_driver *d);
-void ofono_sim_driver_unregister(const struct ofono_sim_driver *d);
 
 struct ofono_sim *ofono_sim_create(struct ofono_modem *modem,
 					unsigned int vendor,
