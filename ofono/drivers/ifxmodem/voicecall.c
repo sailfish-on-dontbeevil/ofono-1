@@ -35,12 +35,12 @@
 #include <ofono/voicecall.h>
 
 #include <drivers/common/call_list.h>
+#include <drivers/atmodem/atutil.h>
 
 #include "gatchat.h"
 #include "gatresult.h"
 
 #include "common.h"
-#include "ifxmodem.h"
 
 static const char *none_prefix[] = { NULL };
 static const char *xlema_prefix[] = { "+XLEMA:", NULL };
@@ -1021,7 +1021,6 @@ static void ifx_voicecall_remove(struct ofono_voicecall *vc)
 }
 
 static const struct ofono_voicecall_driver driver = {
-	.name			= "ifxmodem",
 	.probe			= ifx_voicecall_probe,
 	.remove			= ifx_voicecall_remove,
 	.dial			= ifx_dial,
@@ -1041,12 +1040,4 @@ static const struct ofono_voicecall_driver driver = {
 	.send_tones		= ifx_send_dtmf
 };
 
-void ifx_voicecall_init(void)
-{
-	ofono_voicecall_driver_register(&driver);
-}
-
-void ifx_voicecall_exit(void)
-{
-	ofono_voicecall_driver_unregister(&driver);
-}
+OFONO_ATOM_DRIVER_BUILTIN(voicecall, ifxmodem, &driver)

@@ -35,7 +35,7 @@
 #include "src/common.h"
 
 #include "qmi.h"
-#include "qmimodem.h"
+#include "util.h"
 #include "voice.h"
 #include "voice_generated.h"
 
@@ -538,7 +538,6 @@ static void send_dtmf(struct ofono_voicecall *vc, const char *dtmf,
 }
 
 static const struct ofono_voicecall_driver driver = {
-	.name		= "qmimodem",
 	.probe		= qmi_voicecall_probe,
 	.remove		= qmi_voicecall_remove,
 	.dial		= dial,
@@ -548,12 +547,4 @@ static const struct ofono_voicecall_driver driver = {
 	.send_tones = send_dtmf,
 };
 
-void qmi_voicecall_init(void)
-{
-	ofono_voicecall_driver_register(&driver);
-}
-
-void qmi_voicecall_exit(void)
-{
-	ofono_voicecall_driver_unregister(&driver);
-}
+OFONO_ATOM_DRIVER_BUILTIN(voicecall, qmimodem, &driver)

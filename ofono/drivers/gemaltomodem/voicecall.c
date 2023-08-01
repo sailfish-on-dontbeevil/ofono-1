@@ -36,13 +36,12 @@
 #include <ofono/voicecall.h>
 
 #include <drivers/common/call_list.h>
+#include <drivers/atmodem/atutil.h>
 
 #include "gatchat.h"
 #include "gatresult.h"
 
 #include "common.h"
-
-#include "gemaltomodem.h"
 
 static const char *clcc_prefix[] = { "+CLCC:", NULL };
 static const char *none_prefix[] = { NULL };
@@ -549,7 +548,6 @@ static void gemalto_voicecall_remove(struct ofono_voicecall *vc)
 }
 
 static const struct ofono_voicecall_driver driver = {
-	.name			= "gemaltomodem",
 	.probe			= gemalto_voicecall_probe,
 	.remove			= gemalto_voicecall_remove,
 	.dial			= gemalto_dial,
@@ -567,12 +565,4 @@ static const struct ofono_voicecall_driver driver = {
 	.send_tones		= gemalto_send_dtmf
 };
 
-void gemalto_voicecall_init(void)
-{
-	ofono_voicecall_driver_register(&driver);
-}
-
-void gemalto_voicecall_exit(void)
-{
-	ofono_voicecall_driver_unregister(&driver);
-}
+OFONO_ATOM_DRIVER_BUILTIN(voicecall, gemaltomodem, &driver)
