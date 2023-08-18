@@ -295,10 +295,7 @@ builtin_sources += 	drivers/atmodem/atmodem.h \
 			drivers/atmodem/lte.c \
 			drivers/common/call_list.c
 
-builtin_modules += nwmodem
 builtin_sources += drivers/atmodem/atutil.h \
-			drivers/nwmodem/nwmodem.h \
-			drivers/nwmodem/nwmodem.c \
 			drivers/nwmodem/radio-settings.c
 
 builtin_modules += swmodem
@@ -307,10 +304,7 @@ builtin_sources += drivers/atmodem/atutil.h \
 			drivers/swmodem/swmodem.c \
 			drivers/swmodem/gprs-context.c
 
-builtin_modules += ztemodem
 builtin_sources += drivers/atmodem/atutil.h \
-			drivers/ztemodem/ztemodem.h \
-			drivers/ztemodem/ztemodem.c \
 			drivers/ztemodem/radio-settings.c
 
 builtin_modules += iceramodem
