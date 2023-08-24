@@ -473,7 +473,6 @@ static void cellinfo_netmon_remove(struct ofono_netmon *netmon)
 }
 
 const struct ofono_netmon_driver cellinfo_netmon_driver = {
-	.name                   = "cellinfo",
 	.probe			= cellinfo_netmon_probe,
 	.remove			= cellinfo_netmon_remove,
 	.request_update		= cellinfo_netmon_request_update,
@@ -482,13 +481,14 @@ const struct ofono_netmon_driver cellinfo_netmon_driver = {
 
 static int cellinfo_netmon_init(void)
 {
-	return ofono_netmon_driver_register(&cellinfo_netmon_driver);
+	return 0;
 }
 
 static void cellinfo_netmon_exit(void)
 {
-	ofono_netmon_driver_unregister(&cellinfo_netmon_driver);
 }
+
+OFONO_ATOM_DRIVER_BUILTIN(netmon, cellinfo_netmon, &cellinfo_netmon_driver)
 
 OFONO_PLUGIN_DEFINE(cellinfo_netmon, "CellInfo NetMon Plugin",
 	OFONO_VERSION, OFONO_PLUGIN_PRIORITY_DEFAULT,
