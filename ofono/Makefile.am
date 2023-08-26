@@ -150,10 +150,7 @@ builtin_sources += plugins/infineon.c
 builtin_modules += ril_intel
 builtin_sources += plugins/ril_intel.c
 
-builtin_modules += rilmodem
-builtin_sources += drivers/rilmodem/rilmodem.h \
-			drivers/rilmodem/vendor.h \
-			drivers/rilmodem/rilmodem.c \
+builtin_sources += drivers/rilmodem/vendor.h \
 			drivers/rilmodem/devinfo.c \
 			drivers/rilmodem/network-registration.c \
 			drivers/rilmodem/voicecall.c \
@@ -178,10 +175,7 @@ builtin_sources += drivers/rilmodem/rilmodem.h \
 endif
 
 if ISIMODEM
-builtin_modules += isimodem
 builtin_sources += $(gisi_sources) \
-			drivers/isimodem/isimodem.h \
-			drivers/isimodem/isimodem.c \
 			drivers/isimodem/mtc.h \
 			drivers/isimodem/debug.h \
 			drivers/isimodem/isiutil.h \
@@ -242,11 +236,8 @@ qmi_sources = drivers/qmimodem/qmi.h drivers/qmimodem/qmi.c \
 					drivers/qmimodem/voice.h \
 					drivers/qmimodem/voice.c
 
-builtin_modules += qmimodem
 builtin_sources += $(qmi_sources) \
 			drivers/qmimodem/util.h \
-			drivers/qmimodem/qmimodem.h \
-			drivers/qmimodem/qmimodem.c \
 			drivers/qmimodem/devinfo.c \
 			drivers/qmimodem/voicecall.c \
 			drivers/qmimodem/voice_generated.c \
@@ -266,11 +257,32 @@ builtin_modules += gobi
 builtin_sources += plugins/gobi.c
 endif
 
+if MBIMMODEM
+mbim_sources =	drivers/mbimmodem/mbim.h \
+		drivers/mbimmodem/mbim.c \
+		drivers/mbimmodem/mbim-private.h \
+		drivers/mbimmodem/mbim-desc.h \
+		drivers/mbimmodem/mbim-desc.c \
+		drivers/mbimmodem/mbim-message.h \
+		drivers/mbimmodem/mbim-message.c
+
+builtin_sources += $(mbim_sources) \
+			drivers/mbimmodem/util.h \
+			drivers/mbimmodem/util.c \
+			drivers/mbimmodem/mbimmodem.h \
+			drivers/mbimmodem/devinfo.c \
+			drivers/mbimmodem/sim.c \
+			drivers/mbimmodem/network-registration.c \
+			drivers/mbimmodem/sms.c \
+			drivers/mbimmodem/gprs.c \
+			drivers/mbimmodem/gprs-context.c
+
+builtin_modules += mbim
+builtin_sources += plugins/mbim.c
+endif
+
 if ATMODEM
-builtin_modules += atmodem
-builtin_sources += 	drivers/atmodem/atmodem.h \
-			drivers/atmodem/atmodem.c \
-			drivers/atmodem/call-settings.c \
+builtin_sources += drivers/atmodem/call-settings.c \
 			drivers/atmodem/sms.c \
 			drivers/atmodem/cbs.c \
 			drivers/atmodem/call-forwarding.c \
@@ -298,26 +310,17 @@ builtin_sources += 	drivers/atmodem/atmodem.h \
 builtin_sources += drivers/atmodem/atutil.h \
 			drivers/nwmodem/radio-settings.c
 
-builtin_modules += swmodem
 builtin_sources += drivers/atmodem/atutil.h \
-			drivers/swmodem/swmodem.h \
-			drivers/swmodem/swmodem.c \
 			drivers/swmodem/gprs-context.c
 
 builtin_sources += drivers/atmodem/atutil.h \
 			drivers/ztemodem/radio-settings.c
 
-builtin_modules += iceramodem
 builtin_sources += drivers/atmodem/atutil.h \
-			drivers/iceramodem/iceramodem.h \
-			drivers/iceramodem/iceramodem.c \
 			drivers/iceramodem/gprs-context.c \
 			drivers/iceramodem/radio-settings.c
 
-builtin_modules += huaweimodem
 builtin_sources += drivers/atmodem/atutil.h \
-			drivers/huaweimodem/huaweimodem.h \
-			drivers/huaweimodem/huaweimodem.c \
 			drivers/huaweimodem/ussd.c \
 			drivers/huaweimodem/voicecall.c \
 			drivers/huaweimodem/audio-settings.c \
@@ -328,32 +331,20 @@ builtin_sources += drivers/atmodem/atutil.h \
 			drivers/calypsomodem/voicecall.c \
 			drivers/calypsomodem/stk.c
 
-builtin_modules += mbmmodem
 builtin_sources += drivers/atmodem/atutil.h \
-			drivers/mbmmodem/mbmmodem.h \
-			drivers/mbmmodem/mbmmodem.c \
 			drivers/mbmmodem/gprs-context.c \
 			drivers/mbmmodem/stk.c \
 			drivers/mbmmodem/location-reporting.c
 
-builtin_modules += telitmodem
 builtin_sources += drivers/atmodem/atutil.h \
-			drivers/telitmodem/telitmodem.h \
-			drivers/telitmodem/telitmodem.c \
 			drivers/telitmodem/location-reporting.c \
 			drivers/telitmodem/gprs-context-ncm.c
 
-builtin_modules += hsomodem
 builtin_sources += drivers/atmodem/atutil.h \
-			drivers/hsomodem/hsomodem.h \
-			drivers/hsomodem/hsomodem.c \
 			drivers/hsomodem/gprs-context.c \
 			drivers/hsomodem/radio-settings.c
 
-builtin_modules += ifxmodem
 builtin_sources += drivers/atmodem/atutil.h \
-			drivers/ifxmodem/ifxmodem.h \
-			drivers/ifxmodem/ifxmodem.c \
 			drivers/ifxmodem/voicecall.c \
 			drivers/ifxmodem/audio-settings.c \
 			drivers/ifxmodem/radio-settings.c \
@@ -363,7 +354,6 @@ builtin_sources += drivers/atmodem/atutil.h \
 
 builtin_modules += stemodem
 builtin_sources += drivers/atmodem/atutil.h \
-			drivers/stemodem/stemodem.h \
 			drivers/stemodem/stemodem.c \
 			drivers/stemodem/voicecall.c \
 			drivers/stemodem/radio-settings.c \
@@ -373,10 +363,7 @@ builtin_sources += drivers/atmodem/atutil.h \
 			drivers/stemodem/caif_socket.h \
 			drivers/stemodem/if_caif.h
 
-builtin_modules += dunmodem
 builtin_sources += drivers/atmodem/atutil.h \
-			drivers/dunmodem/dunmodem.h \
-			drivers/dunmodem/dunmodem.c \
 			drivers/dunmodem/network-registration.c \
 			drivers/dunmodem/gprs.c
 
@@ -393,7 +380,6 @@ builtin_sources += drivers/atmodem/atutil.h \
 builtin_sources += drivers/atmodem/atutil.h \
 			drivers/speedupmodem/ussd.c
 
-builtin_modules += ubloxmodem
 builtin_sources += drivers/atmodem/atutil.h \
 			drivers/ubloxmodem/ubloxmodem.h \
 			drivers/ubloxmodem/ubloxmodem.c \
@@ -403,10 +389,7 @@ builtin_sources += drivers/atmodem/atutil.h \
 			drivers/ubloxmodem/lte.c
 
 
-builtin_modules += gemaltomodem
 builtin_sources += drivers/atmodem/atutil.h \
-			drivers/gemaltomodem/gemaltomodem.h \
-			drivers/gemaltomodem/gemaltomodem.c \
 			drivers/gemaltomodem/location-reporting.c \
 			drivers/gemaltomodem/voicecall.c \
 			drivers/gemaltomodem/gprs-context.c \
@@ -660,7 +643,6 @@ builtin_sources += $(mbim_sources) \
 			drivers/mbimmodem/util.h \
 			drivers/mbimmodem/util.c \
 			drivers/mbimmodem/mbimmodem.h \
-			drivers/mbimmodem/mbimmodem.c \
 			drivers/mbimmodem/devinfo.c \
 			drivers/mbimmodem/sim.c \
 			drivers/mbimmodem/network-registration.c \
