@@ -1005,7 +1005,6 @@ static void phonebook_remove(struct ofono_phonebook *pb)
 }
 
 static const struct ofono_phonebook_driver phonebook_driver = {
-	.name		= "generic",
 	.probe		= phonebook_probe,
 	.remove		= phonebook_remove,
 	.export_entries	= export_entries
@@ -1013,13 +1012,14 @@ static const struct ofono_phonebook_driver phonebook_driver = {
 
 static int phonebook_init(void)
 {
-	return ofono_phonebook_driver_register(&phonebook_driver);
+	return 0;
 }
 
 static void phonebook_exit(void)
 {
-	ofono_phonebook_driver_unregister(&phonebook_driver);
 }
+
+OFONO_ATOM_DRIVER_BUILTIN(phonebook, generic_phonebook, &phonebook_driver)
 
 OFONO_PLUGIN_DEFINE(generic_phonebook, "Generic Phonebook Plugin",
 	OFONO_VERSION, OFONO_PLUGIN_PRIORITY_DEFAULT,
