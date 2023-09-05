@@ -90,7 +90,8 @@ autoreconf --force --install
     --disable-rilmodem \
     --disable-isimodem \
     --enable-qmimodem \
-    --with-systemdunitdir=%{_unitdir}
+    --with-systemdunitdir=%{_unitdir} \
+    --enable-ell
 
 make %{_smp_mflags}
 

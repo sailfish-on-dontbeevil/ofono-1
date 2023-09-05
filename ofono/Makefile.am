@@ -5,6 +5,10 @@ ACLOCAL_AMFLAGS = -I build-aux
 
 noinst_LTLIBRARIES =
 
+ell_cflags = @ELL_CFLAGS@
+ell_ldadd = @ELL_LIBS@
+ell_built_sources = ell/shared
+
 pkginclude_HEADERS = include/log.h include/plugin.h include/history.h \
 			include/dbus.h include/modem.h include/types.h \
 			include/call-barring.h include/call-forwarding.h \
@@ -657,9 +661,8 @@ builtin_sources += plugins/smshistory.c
 builtin_modules += allowed_apns
 builtin_sources += plugins/allowed-apns.c
 
-if ELL
-builtin_cflags += @ELL_CFLAGS@
-builtin_libadd += @ELL_LIBS@
+builtin_cflags += $(ell_cflags)
+builtin_libadd += -L/usr/lib64 -lell
 
 if MBIMMODEM
 mbim_sources =	drivers/mbimmodem/mbim.h \
@@ -685,7 +688,6 @@ builtin_sources += $(mbim_sources) \
 
 builtin_modules += mbim
 builtin_sources += plugins/mbim.c
-endif
 endif
 
 sbin_PROGRAMS = src/ofonod
@@ -728,7 +730,7 @@ src_ofonod_SOURCES = $(builtin_sources) $(gatchat_sources) src/ofono.ver \
 			src/sim-info.c src/sim-info-dbus.c \
 			src/conf.c src/mtu-limit.c
 
-src_ofonod_LDADD = gdbus/libgdbus-internal.la $(builtin_libadd) \
+src_ofonod_LDADD = gdbus/libgdbus-internal.la $(builtin_libadd) @ELL_LIBS@ \
 			@GLIB_LIBS@ @DBUS_LIBS@ -ldl
 
 src_ofonod_LDFLAGS = -Wl,--export-dynamic \
@@ -747,7 +749,7 @@ else
 build_plugindir = $(plugindir)
 endif
 
-AM_CFLAGS = @DBUS_CFLAGS@ @GLIB_CFLAGS@ $(builtin_cflags) \
+AM_CFLAGS = @DBUS_CFLAGS@ @GLIB_CFLAGS@ $(ell_cflags) $(builtin_cflags) \
 					-DOFONO_PLUGIN_BUILTIN \
 					-DPLUGINDIR=\""$(build_plugindir)"\"
 
@@ -1016,23 +1018,23 @@ noinst_PROGRAMS = $(unit_tests) \
 
 unit_test_common_SOURCES = unit/test-common.c src/common.c src/util.c
 unit_test_common_CFLAGS = $(COVERAGE_OPT) $(AM_CFLAGS)
-unit_test_common_LDADD = @GLIB_LIBS@
+unit_test_common_LDADD = @GLIB_LIBS@ $(ell_ldadd)
 unit_objects += $(unit_test_common_OBJECTS)
 
 unit_test_util_SOURCES = unit/test-util.c src/util.c
 unit_test_util_CFLAGS = $(COVERAGE_OPT) $(AM_CFLAGS)
-unit_test_util_LDADD = @GLIB_LIBS@
+unit_test_util_LDADD = @GLIB_LIBS@ $(ell_ldadd)
 unit_objects += $(unit_test_utils_OBJECTS)
 
 unit_test_idmap_SOURCES = unit/test-idmap.c src/idmap.c
 unit_test_idmap_CFLAGS = $(COVERAGE_OPT) $(AM_CFLAGS)
-unit_test_idmap_LDADD = @GLIB_LIBS@
+unit_test_idmap_LDADD = @GLIB_LIBS@ $(ell_ldadd)
 unit_objects += $(unit_test_idmap_OBJECTS)
 
 unit_test_simutil_SOURCES = unit/test-simutil.c src/util.c \
                                 src/simutil.c src/smsutil.c src/storage.c
 unit_test_simutil_CFLAGS = $(COVERAGE_OPT) $(AM_CFLAGS)
-unit_test_simutil_LDADD = @GLIB_LIBS@
+unit_test_simutil_LDADD = @GLIB_LIBS@ $(ell_ldadd)
 unit_objects += $(unit_test_simutil_OBJECTS)
 
 unit_test_stkutil_SOURCES = unit/test-stkutil.c unit/stk-test-data.h \
@@ -1040,18 +1042,18 @@ unit_test_stkutil_SOURCES = unit/test-stkutil.c unit/stk-test-data.h \
                                 src/storage.c src/smsutil.c \
                                 src/simutil.c src/stkutil.c
 unit_test_stkutil_CFLAGS = $(COVERAGE_OPT) $(AM_CFLAGS)
-unit_test_stkutil_LDADD = @GLIB_LIBS@
+unit_test_stkutil_LDADD = @GLIB_LIBS@ $(ell_ldadd)
 unit_objects += $(unit_test_stkutil_OBJECTS)
 
 unit_test_sms_SOURCES = unit/test-sms.c src/util.c src/smsutil.c src/storage.c
 unit_test_sms_CFLAGS = $(COVERAGE_OPT) $(AM_CFLAGS)
-unit_test_sms_LDADD = @GLIB_LIBS@
+unit_test_sms_LDADD = @GLIB_LIBS@ $(ell_ldadd)
 unit_objects += $(unit_test_sms_OBJECTS)
 
 unit_test_sms_root_SOURCES = unit/test-sms-root.c \
 					src/util.c src/smsutil.c src/storage.c
 unit_test_sms_root_CFLAGS = -DSTORAGEDIR='"/tmp/ofono"' $(COVERAGE_OPT) $(AM_CFLAGS)
-unit_test_sms_root_LDADD = @GLIB_LIBS@
+unit_test_sms_root_LDADD = @GLIB_LIBS@ $(ell_ldadd)
 unit_objects += $(unit_test_sms_root_OBJECTS)
 
 unit_test_call_list_SOURCES = \
@@ -1138,34 +1140,34 @@ unit_test_rilmodem_cs_SOURCES = $(test_rilmodem_sources) \
 					unit/test-rilmodem-cs.c \
 					drivers/rilmodem/call-settings.c
 unit_test_rilmodem_cs_LDADD = gdbus/libgdbus-internal.la $(builtin_libadd) \
-					@GLIB_LIBS@ @DBUS_LIBS@ -ldl
+					@GLIB_LIBS@ @DBUS_LIBS@ $(ell_ldadd) -ldl
 unit_objects += $(unit_test_rilmodem_cs_OBJECTS)
 
 unit_test_rilmodem_sms_SOURCES = $(test_rilmodem_sources) \
 					unit/test-rilmodem-sms.c \
 					drivers/rilmodem/sms.c
 unit_test_rilmodem_sms_LDADD = gdbus/libgdbus-internal.la $(builtin_libadd) \
-					@GLIB_LIBS@ @DBUS_LIBS@ -ldl
+					@GLIB_LIBS@ @DBUS_LIBS@ $(ell_ldadd) -ldl
 unit_objects += $(unit_test_rilmodem_sms_OBJECTS)
 
 unit_test_rilmodem_cb_SOURCES = $(test_rilmodem_sources) \
 					unit/test-rilmodem-cb.c \
 					drivers/rilmodem/call-barring.c
 unit_test_rilmodem_cb_LDADD = gdbus/libgdbus-internal.la $(builtin_libadd) \
-					@GLIB_LIBS@ @DBUS_LIBS@ -ldl
+					@GLIB_LIBS@ @DBUS_LIBS@ $(ell_ldadd) -ldl
 unit_objects += $(unit_test_rilmodem_cb_OBJECTS)
 
 unit_test_rilmodem_gprs_SOURCES = $(test_rilmodem_sources) \
 					unit/test-rilmodem-gprs.c \
 					drivers/rilmodem/gprs.c
 unit_test_rilmodem_gprs_LDADD = gdbus/libgdbus-internal.la $(builtin_libadd) \
-					@GLIB_LIBS@ @DBUS_LIBS@ -ldl
+					@GLIB_LIBS@ @DBUS_LIBS@ $(ell_ldadd) -ldl
 unit_objects += $(unit_test_rilmodem_gprs_OBJECTS)
 
 unit_test_mbim_SOURCES = unit/test-mbim.c \
 			 drivers/mbimmodem/mbim-message.c \
 			 drivers/mbimmodem/mbim.c
-unit_test_mbim_LDADD = @ELL_LIBS@
+unit_test_mbim_LDADD = @ELL_LIBS@ $(ell_ldadd)
 unit_objects += $(unit_test_mbim_OBJECTS)
 
 TESTS = $(unit_tests)
