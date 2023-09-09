@@ -22,6 +22,7 @@ BuildRequires: pkgconfig(rpm)
 Requires:   dbus
 Requires:   systemd
 Requires:   libglibutil >= %{libglibutil_version}
+Requires:   ell
 %{recommend}: mobile-broadband-provider-info
 %{recommend}: ofono-configs
 Requires(preun): systemd
@@ -42,6 +43,7 @@ BuildRequires:  pkgconfig(systemd)
 BuildRequires:  libtool
 BuildRequires:  automake
 BuildRequires:  autoconf
+BuildRequires:  ell-devel
 
 %description
 Telephony stack
