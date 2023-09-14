@@ -1866,6 +1866,7 @@ OFONO_DEFINE_ATOM_CREATE(sms, OFONO_ATOM_TYPE_SMS, {
 	atom->ref = 1;
 	atom->txq = g_queue_new();
 	atom->messages = g_hash_table_new(uuid_hash, uuid_equal);
+	atom->filter_chain = __ofono_sms_filter_chain_new(atom, modem);
 })
 
 static void mw_watch(struct ofono_atom *atom,
