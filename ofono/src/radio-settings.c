@@ -755,6 +755,7 @@ static void radio_settings_remove(struct ofono_atom *atom)
 
 OFONO_DEFINE_ATOM_CREATE(radio_settings, OFONO_ATOM_TYPE_RADIO_SETTINGS, {
 	atom->mode = -1;
+	atom->q = __ofono_dbus_queue_new();
 })
 
 static void ofono_radio_finish_register(struct ofono_radio_settings *rs)
